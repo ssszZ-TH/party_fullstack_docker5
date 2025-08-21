@@ -1,9 +1,13 @@
+# Main FastAPI application with router import
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config.settings import ALLOWED_ORIGINS, ALLOWED_METHODS, DATABASE_URL
 from databases import Database
+
+from app.controllers.auth.auth import router as auth_router
+from app.controllers.users.user import router as user_router
 
 load_dotenv()
 
@@ -22,6 +26,7 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI app with lifespan event handler
 app = FastAPI(lifespan=lifespan)
 
+
 # Configure CORS to allow all origins for development
 app.add_middleware(
     CORSMiddleware,
@@ -34,3 +39,6 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": "FastAPI Backend", "github": "https://github.com/ssszZ-TH/party_fullstack_docker5"}
+
+app.include_router(auth_router)
+app.include_router(user_router)
