@@ -1,44 +1,39 @@
-# Main FastAPI application with router import
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.config.settings import ALLOWED_ORIGINS, ALLOWED_METHODS, DATABASE_URL
-from databases import Database
-
+from app.config.database import database
 from app.controllers.auth.auth import router as auth_router
 from app.controllers.users.user import router as user_router
+from app.controllers.persons.person import router as person_router
+from app.controllers.organizations.organization import router as organization_router
 
 load_dotenv()
-
-# Database connection
-database = Database(DATABASE_URL)
 
 # Define lifespan event handler for FastAPI application
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Connect to the database when the application starts
     await database.connect()
     yield
-    # Disconnect from the database when the application shuts down
     await database.disconnect()
 
 # Initialize FastAPI app with lifespan event handler
 app = FastAPI(lifespan=lifespan)
 
-
 # Configure CORS to allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=ALLOWED_METHODS,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(user_router)
+app.include_router(person_router)
+app.include_router(organization_router)
 
 @app.get("/")
 async def root():
     return {"message": "FastAPI Backend", "github": "https://github.com/ssszZ-TH/party_fullstack_docker5"}
-
-app.include_router(auth_router)
-app.include_router(user_router)
