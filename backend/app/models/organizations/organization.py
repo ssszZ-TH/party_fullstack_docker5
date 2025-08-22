@@ -7,6 +7,8 @@ import logging
 from typing import Optional, List
 from datetime import datetime
 
+from app.schemas.user import UserCreate
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -126,8 +128,8 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
                     action_by=action_by
                 )
                 logger.info(f"Created organization: id={user_result.id}")
+                # แก้ไขการสร้าง OrganizationOut โดยไม่ส่ง id ซ้ำ
                 return OrganizationOut(
-                    id=user_result.id,
                     username=user_result.username,
                     email=user_result.email,
                     **result._mapping
@@ -196,7 +198,6 @@ async def update_organization(organization_id: int, organization: OrganizationUp
             )
             logger.info(f"Updated organization: id={organization_id}")
             return OrganizationOut(
-                id=organization_id,
                 username=old_data.username,
                 email=old_data.email,
                 **result._mapping

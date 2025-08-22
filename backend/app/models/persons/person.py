@@ -5,7 +5,9 @@ from app.models.users.user import create_user, log_user_history
 import bcrypt
 import logging
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, date
+
+from app.schemas.user import UserCreate
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,7 +56,7 @@ async def get_all_persons() -> List[PersonOut]:
 
 # บันทึกประวัติการกระทำของ person
 async def log_person_history(person_id: int, personal_id_number: str, first_name: str, middle_name: Optional[str], 
-                             last_name: str, nick_name: Optional[str], birth_date: str, gender_type_id: Optional[int], 
+                             last_name: str, nick_name: Optional[str], birth_date: date, gender_type_id: Optional[int], 
                              marital_status_type_id: Optional[int], country_id: Optional[int], height: int, 
                              weight: int, racial_type_id: Optional[int], income_range_id: Optional[int], 
                              about_me: Optional[str], action: str, action_by: Optional[int] = None):
@@ -73,7 +75,7 @@ async def log_person_history(person_id: int, personal_id_number: str, first_name
         "middle_name": middle_name,
         "last_name": last_name,
         "nick_name": nick_name,
-        "birth_date": birth_date,
+        "birth_date": birth_date,  # ใช้ date object
         "gender_type_id": gender_type_id,
         "marital_status_type_id": marital_status_type_id,
         "country_id": country_id,
@@ -122,7 +124,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
                 "middle_name": person.middle_name,
                 "last_name": person.last_name,
                 "nick_name": person.nick_name,
-                "birth_date": person.birth_date,
+                "birth_date": person.birth_date,  # ใช้ date object
                 "gender_type_id": person.gender_type_id,
                 "marital_status_type_id": person.marital_status_type_id,
                 "country_id": person.country_id,
@@ -142,7 +144,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
                     middle_name=person.middle_name,
                     last_name=person.last_name,
                     nick_name=person.nick_name,
-                    birth_date=person.birth_date,
+                    birth_date=person.birth_date,  # ใช้ date object
                     gender_type_id=person.gender_type_id,
                     marital_status_type_id=person.marital_status_type_id,
                     country_id=person.country_id,
@@ -156,7 +158,6 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
                 )
                 logger.info(f"Created person: id={user_result.id}")
                 return PersonOut(
-                    id=user_result.id,
                     username=user_result.username,
                     email=user_result.email,
                     **result._mapping
@@ -240,7 +241,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
                 middle_name=old_data.middle_name,
                 last_name=old_data.last_name,
                 nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,
+                birth_date=old_data.birth_date,  # ใช้ date object
                 gender_type_id=old_data.gender_type_id,
                 marital_status_type_id=old_data.marital_status_type_id,
                 country_id=old_data.country_id,
@@ -254,7 +255,6 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             )
             logger.info(f"Updated person: id={person_id}")
             return PersonOut(
-                id=person_id,
                 username=old_data.username,
                 email=old_data.email,
                 **result._mapping
@@ -278,7 +278,7 @@ async def delete_person(person_id: int, action_by: Optional[int] = None) -> Opti
                 middle_name=old_data.middle_name,
                 last_name=old_data.last_name,
                 nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,
+                birth_date=old_data.birth_date,  # ใช้ date object
                 gender_type_id=old_data.gender_type_id,
                 marital_status_type_id=old_data.marital_status_type_id,
                 country_id=old_data.country_id,
