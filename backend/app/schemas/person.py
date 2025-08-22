@@ -12,7 +12,7 @@ class PersonCreate(BaseModel):
     middle_name: Optional[str] = None
     last_name: str
     nick_name: Optional[str] = None
-    birth_date: date  # เปลี่ยนจาก str เป็น date
+    birth_date: date
     gender_type_id: Optional[int] = None
     marital_status_type_id: Optional[int] = None
     country_id: Optional[int] = None
@@ -29,7 +29,7 @@ class PersonUpdate(BaseModel):
     middle_name: Optional[str] = None
     last_name: Optional[str] = None
     nick_name: Optional[str] = None
-    birth_date: Optional[date] = None  # เปลี่ยนจาก str เป็น date
+    birth_date: Optional[date] = None
     gender_type_id: Optional[int] = None
     marital_status_type_id: Optional[int] = None
     country_id: Optional[int] = None
@@ -49,7 +49,7 @@ class PersonOut(BaseModel):
     middle_name: Optional[str] = None
     last_name: str
     nick_name: Optional[str] = None
-    birth_date: date  # เปลี่ยนจาก str เป็น date
+    birth_date: date
     gender_type_id: Optional[int] = None
     marital_status_type_id: Optional[int] = None
     country_id: Optional[int] = None

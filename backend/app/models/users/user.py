@@ -36,7 +36,7 @@ async def log_user_history(user_id: int, username: str, email: str, password: st
     logger.info(f"Logged history: user_id={user_id}, action={action}, action_by={action_by}")
 
 # สร้างผู้ใช้ใหม่
-async def create_user(user: UserCreate, action_by: Optional[int] = None) -> Optional[UserOut]:
+async def create_user(user: UserCreate, action_by: Optional[int]) -> Optional[UserOut]:
     async with database.transaction():
         try:
             existing_user = await get_user_by_email(user.email)
@@ -68,7 +68,7 @@ async def create_user(user: UserCreate, action_by: Optional[int] = None) -> Opti
                     action="create",
                     action_by=action_by
                 )
-                logger.info(f"Created user: {user.email}, role: {user.role}")
+                logger.info(f"Created user: {user.email}, role={user.role}")
                 return UserOut(**result._mapping)
             return None
         except ValueError as e:
@@ -90,11 +90,11 @@ async def get_all_users() -> List[UserOut]:
     return [UserOut(**result._mapping) for result in results]
 
 # อัปเดตข้อมูลผู้ใช้
-async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int] = None) -> Optional[UserOut]:
+async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int]) -> Optional[UserOut]:
     async with database.transaction():
         values = {"id": user_id, "updated_at": datetime.utcnow()}
         query_parts = []
-        
+
         if user.username is not None:
             query_parts.append("username = :username")
             values["username"] = user.username
@@ -139,7 +139,7 @@ async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int] =
         return None
 
 # ลบผู้ใช้
-async def delete_user(user_id: int, action_by: Optional[int] = None) -> Optional[int]:
+async def delete_user(user_id: int, action_by: Optional[int]) -> Optional[int]:
     async with database.transaction():
         old_data = await get_user(user_id)
         if not old_data:

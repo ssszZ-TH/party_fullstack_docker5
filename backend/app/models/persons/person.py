@@ -2,12 +2,11 @@ from app.config.database import database
 from app.config.settings import BCRYPT_SALT
 from app.schemas.person import PersonCreate, PersonUpdate, PersonOut
 from app.models.users.user import create_user, log_user_history
+from app.schemas.user import UserCreate
 import bcrypt
 import logging
 from typing import Optional, List
 from datetime import datetime, date
-
-from app.schemas.user import UserCreate
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -75,7 +74,7 @@ async def log_person_history(person_id: int, personal_id_number: str, first_name
         "middle_name": middle_name,
         "last_name": last_name,
         "nick_name": nick_name,
-        "birth_date": birth_date,  # ใช้ date object
+        "birth_date": birth_date,
         "gender_type_id": gender_type_id,
         "marital_status_type_id": marital_status_type_id,
         "country_id": country_id,
@@ -92,7 +91,7 @@ async def log_person_history(person_id: int, personal_id_number: str, first_name
     logger.info(f"Logged person history: person_id={person_id}, action={action}, action_by={action_by}")
 
 # สร้าง person ใหม่
-async def create_person(person: PersonCreate, action_by: Optional[int] = None) -> Optional[PersonOut]:
+async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optional[PersonOut]:
     async with database.transaction():
         try:
             user = UserCreate(username=person.username, email=person.email, password=person.password, role="person_user")
@@ -124,7 +123,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
                 "middle_name": person.middle_name,
                 "last_name": person.last_name,
                 "nick_name": person.nick_name,
-                "birth_date": person.birth_date,  # ใช้ date object
+                "birth_date": person.birth_date,
                 "gender_type_id": person.gender_type_id,
                 "marital_status_type_id": person.marital_status_type_id,
                 "country_id": person.country_id,
@@ -144,7 +143,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
                     middle_name=person.middle_name,
                     last_name=person.last_name,
                     nick_name=person.nick_name,
-                    birth_date=person.birth_date,  # ใช้ date object
+                    birth_date=person.birth_date,
                     gender_type_id=person.gender_type_id,
                     marital_status_type_id=person.marital_status_type_id,
                     country_id=person.country_id,
@@ -168,7 +167,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int] = None) -
             raise
 
 # อัปเดตข้อมูล person
-async def update_person(person_id: int, person: PersonUpdate, action_by: Optional[int] = None) -> Optional[PersonOut]:
+async def update_person(person_id: int, person: PersonUpdate, action_by: Optional[int]) -> Optional[PersonOut]:
     async with database.transaction():
         values = {"id": person_id, "updated_at": datetime.utcnow()}
         query_parts = []
@@ -241,7 +240,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
                 middle_name=old_data.middle_name,
                 last_name=old_data.last_name,
                 nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,  # ใช้ date object
+                birth_date=old_data.birth_date,
                 gender_type_id=old_data.gender_type_id,
                 marital_status_type_id=old_data.marital_status_type_id,
                 country_id=old_data.country_id,
@@ -262,7 +261,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         return None
 
 # ลบ person
-async def delete_person(person_id: int, action_by: Optional[int] = None) -> Optional[int]:
+async def delete_person(person_id: int, action_by: Optional[int]) -> Optional[int]:
     async with database.transaction():
         old_data = await get_person(person_id)
         if not old_data:
@@ -278,7 +277,7 @@ async def delete_person(person_id: int, action_by: Optional[int] = None) -> Opti
                 middle_name=old_data.middle_name,
                 last_name=old_data.last_name,
                 nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,  # ใช้ date object
+                birth_date=old_data.birth_date,
                 gender_type_id=old_data.gender_type_id,
                 marital_status_type_id=old_data.marital_status_type_id,
                 country_id=old_data.country_id,

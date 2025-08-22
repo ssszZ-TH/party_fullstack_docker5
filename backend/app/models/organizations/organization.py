@@ -2,12 +2,11 @@ from app.config.database import database
 from app.config.settings import BCRYPT_SALT
 from app.schemas.organization import OrganizationCreate, OrganizationUpdate, OrganizationOut
 from app.models.users.user import create_user, log_user_history
+from app.schemas.user import UserCreate
 import bcrypt
 import logging
 from typing import Optional, List
 from datetime import datetime
-
-from app.schemas.user import UserCreate
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,7 +78,7 @@ async def log_organization_history(organization_id: int, federal_tax_id: Optiona
     logger.info(f"Logged organization history: organization_id={organization_id}, action={action}, action_by={action_by}")
 
 # สร้าง organization ใหม่
-async def create_organization(organization: OrganizationCreate, action_by: Optional[int] = None) -> Optional[OrganizationOut]:
+async def create_organization(organization: OrganizationCreate, action_by: Optional[int]) -> Optional[OrganizationOut]:
     async with database.transaction():
         try:
             user = UserCreate(username=organization.username, email=organization.email, password=organization.password, role="organization_user")
@@ -128,7 +127,6 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
                     action_by=action_by
                 )
                 logger.info(f"Created organization: id={user_result.id}")
-                # แก้ไขการสร้าง OrganizationOut โดยไม่ส่ง id ซ้ำ
                 return OrganizationOut(
                     username=user_result.username,
                     email=user_result.email,
@@ -140,7 +138,7 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
             raise
 
 # อัปเดตข้อมูล organization
-async def update_organization(organization_id: int, organization: OrganizationUpdate, action_by: Optional[int] = None) -> Optional[OrganizationOut]:
+async def update_organization(organization_id: int, organization: OrganizationUpdate, action_by: Optional[int]) -> Optional[OrganizationOut]:
     async with database.transaction():
         values = {"id": organization_id, "updated_at": datetime.utcnow()}
         query_parts = []
@@ -205,7 +203,7 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         return None
 
 # ลบ organization
-async def delete_organization(organization_id: int, action_by: Optional[int] = None) -> Optional[int]:
+async def delete_organization(organization_id: int, action_by: Optional[int]) -> Optional[int]:
     async with database.transaction():
         old_data = await get_organization(organization_id)
         if not old_data:

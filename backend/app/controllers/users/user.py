@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime, timedelta
 import logging
 from app.models.users.user import create_user, get_user, update_user, delete_user, get_all_users
+from app.models.persons.person import get_person
+from app.models.organizations.organization import get_organization
 from app.schemas.user import UserCreate, UserUpdate, UserOut
+from app.schemas.person import PersonOut
+from app.schemas.organization import OrganizationOut
 from app.config.settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 logging.basicConfig(level=logging.INFO)
@@ -37,7 +41,7 @@ async def create_user_endpoint(user: UserCreate, current_user: dict = Depends(ge
     if current_user["role"] != "system_admin":
         logger.warning(f"Unauthorized attempt to create user by user: id={current_user['id']}, role={current_user['role']}")
         raise HTTPException(status_code=403, detail="System admin access required")
-    valid_roles = ["system_admin", "hr_admin", "organization_admin"]
+    valid_roles = ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]
     if user.role is not None and user.role not in valid_roles:
         logger.warning(f"Invalid role provided: {user.role}")
         raise HTTPException(status_code=422, detail=f"Role must be one of {valid_roles}")
@@ -48,30 +52,32 @@ async def create_user_endpoint(user: UserCreate, current_user: dict = Depends(ge
     logger.info(f"Created user: {user.email}, role={result.role}")
     return result
 
-# สร้างผู้ใช้ใหม่ผ่าน backdoor (ไม่ต้องใช้ token)
-@router.post("/register", response_model=UserOut)
-async def register_user_endpoint(user: UserCreate):
-    valid_roles = ["system_admin", "hr_admin", "organization_admin"]
-    if user.role is not None and user.role not in valid_roles:
-        logger.warning(f"Invalid role provided: {user.role}")
-        raise HTTPException(status_code=422, detail=f"Role must be one of {valid_roles}")
-    result = await create_user(user, action_by=None)
-    if not result:
-        logger.warning(f"Failed to register user: {user.email}")
-        raise HTTPException(status_code=400, detail="Email already exists")
-    logger.info(f"Registered user: {user.email}, role={result.role}")
-    return result
-
 # ดึงข้อมูลผู้ใช้ปัจจุบัน
-@router.get("/me", response_model=UserOut)
+@router.get("/me", response_model=Union[UserOut, PersonOut, OrganizationOut])
 async def get_current_user_endpoint(current_user: dict = Depends(get_current_user)):
     user_id = current_user["id"]
-    result = await get_user(user_id)
-    if not result:
-        logger.warning(f"User not found: id={user_id}")
-        raise HTTPException(status_code=404, detail="User not found")
-    logger.info(f"Retrieved current user: id={user_id}, role={result.role}")
-    return result
+    role = current_user["role"]
+    if role == "person_user":
+        result = await get_person(user_id)
+        if not result:
+            logger.warning(f"Person not found: id={user_id}")
+            raise HTTPException(status_code=404, detail="Person not found")
+        logger.info(f"Retrieved person: id={user_id}")
+        return result
+    elif role == "organization_user":
+        result = await get_organization(user_id)
+        if not result:
+            logger.warning(f"Organization not found: id={user_id}")
+            raise HTTPException(status_code=404, detail="Organization not found")
+        logger.info(f"Retrieved organization: id={user_id}")
+        return result
+    else:
+        result = await get_user(user_id)
+        if not result:
+            logger.warning(f"User not found: id={user_id}")
+            raise HTTPException(status_code=404, detail="User not found")
+        logger.info(f"Retrieved user: id={user_id}, role={result.role}")
+        return result
 
 # ดึงข้อมูลผู้ใช้ตาม ID (system_admin เท่านั้น)
 @router.get("/{user_id}", response_model=UserOut)
@@ -83,7 +89,7 @@ async def get_user_endpoint(user_id: int, current_user: dict = Depends(get_curre
     if not result:
         logger.warning(f"User not found: id={user_id}")
         raise HTTPException(status_code=404, detail="User not found")
-    if result.role not in ["system_admin", "hr_admin", "organization_admin"]:
+    if result.role not in ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]:
         logger.warning(f"Unauthorized attempt to access user with role={result.role} by user: id={current_user['id']}")
         raise HTTPException(status_code=403, detail="Cannot access this user")
     logger.info(f"Retrieved user: id={user_id}, role={result.role}")
@@ -96,27 +102,13 @@ async def get_all_users_endpoint(current_user: dict = Depends(get_current_user))
         logger.warning(f"Unauthorized attempt to list all users by user: id={current_user['id']}, role={current_user['role']}")
         raise HTTPException(status_code=403, detail="System admin access required")
     results = await get_all_users()
-    filtered_results = [user for user in results if user.role in ["system_admin", "hr_admin", "organization_admin"]]
+    filtered_results = [user for user in results if user.role in ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]]
     logger.info(f"Retrieved {len(filtered_results)} users")
     return filtered_results
 
-# อัปเดตข้อมูลผู้ใช้ปัจจุบัน
-@router.put("/me", response_model=UserOut)
-async def update_user_endpoint(user: UserUpdate, current_user: dict = Depends(get_current_user)):
-    user_id = current_user["id"]
-    if user.role is not None:
-        logger.warning(f"Unauthorized attempt to change role by user: id={user_id}")
-        raise HTTPException(status_code=403, detail="Cannot change role")
-    result = await update_user(user_id, user, action_by=user_id)
-    if not result:
-        logger.warning(f"User not found for update: id={user_id}")
-        raise HTTPException(status_code=404, detail="User not found")
-    logger.info(f"Updated user: id={user_id}, role={result.role}")
-    return result
-
-# อัปเดตผู้ใช้อื่น (system_admin เท่านั้น)
+# อัปเดตข้อมูลผู้ใช้ (system_admin เท่านั้น)
 @router.put("/{user_id}", response_model=UserOut)
-async def update_other_user_endpoint(user_id: int, user: UserUpdate, current_user: dict = Depends(get_current_user)):
+async def update_user_endpoint(user_id: int, user: UserUpdate, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "system_admin":
         logger.warning(f"Unauthorized attempt to update user by id={user_id} by user: id={current_user['id']}, role={current_user['role']}")
         raise HTTPException(status_code=403, detail="System admin access required")
@@ -124,10 +116,10 @@ async def update_other_user_endpoint(user_id: int, user: UserUpdate, current_use
     if not target_user:
         logger.warning(f"User not found for update: id={user_id}")
         raise HTTPException(status_code=404, detail="User not found")
-    if target_user.role not in ["system_admin", "hr_admin", "organization_admin"]:
+    if target_user.role not in ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]:
         logger.warning(f"Unauthorized attempt to update user with role={target_user.role} by user: id={current_user['id']}")
         raise HTTPException(status_code=403, detail="Cannot update this user")
-    valid_roles = ["system_admin", "hr_admin", "organization_admin"]
+    valid_roles = ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]
     if user.role is not None and user.role not in valid_roles:
         logger.warning(f"Invalid role provided: {user.role}")
         raise HTTPException(status_code=422, detail=f"Role must be one of {valid_roles}")
@@ -138,18 +130,7 @@ async def update_other_user_endpoint(user_id: int, user: UserUpdate, current_use
     logger.info(f"Updated user: id={user_id}, role={result.role}")
     return result
 
-# ลบผู้ใช้ปัจจุบัน
-@router.delete("/me")
-async def delete_self_endpoint(current_user: dict = Depends(get_current_user)):
-    user_id = current_user["id"]
-    result = await delete_user(user_id, action_by=user_id)
-    if not result:
-        logger.warning(f"User not found for self-deletion: id={user_id}")
-        raise HTTPException(status_code=404, detail="User not found")
-    logger.info(f"Self-deleted user: id={user_id}")
-    return {"message": "User deleted"}
-
-# ลบผู้ใช้อื่น (system_admin เท่านั้น)
+# ลบผู้ใช้ (system_admin เท่านั้น)
 @router.delete("/{user_id}")
 async def delete_user_endpoint(user_id: int, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "system_admin":
@@ -159,7 +140,7 @@ async def delete_user_endpoint(user_id: int, current_user: dict = Depends(get_cu
     if not target_user:
         logger.warning(f"User not found for deletion: id={user_id}")
         raise HTTPException(status_code=404, detail="User not found")
-    if target_user.role not in ["system_admin", "hr_admin", "organization_admin"]:
+    if target_user.role not in ["system_admin", "hr_admin", "organization_admin", "basetype_admin"]:
         logger.warning(f"Unauthorized attempt to delete user with role={target_user.role} by user: id={current_user['id']}")
         raise HTTPException(status_code=403, detail="Cannot delete this user")
     result = await delete_user(user_id, action_by=current_user["id"])
