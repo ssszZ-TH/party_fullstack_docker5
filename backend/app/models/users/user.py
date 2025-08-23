@@ -89,6 +89,12 @@ async def get_all_users() -> List[UserOut]:
     logger.info(f"Retrieved {len(results)} users")
     return [UserOut(**result._mapping) for result in results]
 
+# ดึงข้อมูลรหัสผ่านผู้ใช้
+async def get_user_password(user_id: int) -> Optional[str]:
+    query = "SELECT password FROM users WHERE id = :id"
+    result = await database.fetch_one(query=query, values={"id": user_id})
+    return result["password"] if result else None
+
 # อัปเดตข้อมูลผู้ใช้
 async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int]) -> Optional[UserOut]:
     async with database.transaction():
@@ -117,6 +123,10 @@ async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int]) 
         if not old_data:
             return None
 
+        old_password = await get_user_password(user_id)
+        if not old_password:
+            return None
+
         query = f"""
             UPDATE users
             SET {', '.join(query_parts)}, updated_at = :updated_at
@@ -129,7 +139,7 @@ async def update_user(user_id: int, user: UserUpdate, action_by: Optional[int]) 
                 user_id=user_id,
                 username=old_data.username,
                 email=old_data.email,
-                password=old_data.password if user.password is None else hashed_password,
+                password=old_password if user.password is None else hashed_password,
                 role=old_data.role,
                 action="update",
                 action_by=action_by
@@ -145,6 +155,10 @@ async def delete_user(user_id: int, action_by: Optional[int]) -> Optional[int]:
         if not old_data:
             return None
 
+        old_password = await get_user_password(user_id)
+        if not old_password:
+            return None
+
         query = "DELETE FROM users WHERE id = :id RETURNING id"
         result = await database.fetch_one(query=query, values={"id": user_id})
         if result:
@@ -152,7 +166,7 @@ async def delete_user(user_id: int, action_by: Optional[int]) -> Optional[int]:
                 user_id=user_id,
                 username=old_data.username,
                 email=old_data.email,
-                password=old_data.password,
+                password=old_password,
                 role=old_data.role,
                 action="delete",
                 action_by=action_by
