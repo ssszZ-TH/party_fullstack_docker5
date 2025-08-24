@@ -55,24 +55,24 @@ export default function HrAdminHome() {
   const theme = useTheme();
 
   // ตรวจสอบ token และ role
-  useEffect(() => {
-    const checkTokenValidity = async () => {
-      const token = Cookies.get('access_token');
-      if (!isAuthenticated || !token || role !== "hr_admin") {
-        logout();
-        navigate("/login/admin", { replace: true });
-        return;
-      }
-      try {
-        await getAdminProfile();
-      } catch (err: any) {
-        console.error('Token validation failed:', err.message);
-        logout();
-        navigate("/login/admin", { replace: true });
-      }
-    };
-    checkTokenValidity();
-  }, [logout, navigate, isAuthenticated, role]);
+  // useEffect(() => {
+  //   const checkTokenValidity = async () => {
+  //     const token = Cookies.get('access_token');
+  //     if (!isAuthenticated || !token || role !== "hr_admin") {
+  //       logout();
+  //       navigate("/login/admin", { replace: true });
+  //       return;
+  //     }
+  //     try {
+  //       await getAdminProfile();
+  //     } catch (err: any) {
+  //       console.error('Token validation failed:', err.message);
+  //       logout();
+  //       navigate("/login/admin", { replace: true });
+  //     }
+  //   };
+  //   checkTokenValidity();
+  // }, [logout, navigate, isAuthenticated, role]);
 
   // แสดง grid ของ services
   const renderServiceGrid = (serviceItems: { name: string; path: string }[]) => (

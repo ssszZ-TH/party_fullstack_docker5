@@ -116,12 +116,117 @@ POST {{backend}}/auth/login
 
 พอ login เสร็จได้ access token
 เอา access token ไป get role
+GET {{backend}}/users/myrole เเนบ JWT bearer token ไปด้วย
+response {
+    "role": "organization_user"
+}
+
+โดย role ทั้งหมดที่มีในระบบมีดังนี้
+'system_admin', 'basetype_admin', 'hr_admin', 'organization_admin', 'organization_user', 'person_user'
+
+เอา access_token, role ไป set ลงใน cookie
+
+set state ใน auth context นี้
+frontend\src\contexts\AuthContext.tsx
+
+import React, { createContext, useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+
+// Interface for AuthContext
+interface AuthContextType {
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  role: string | null;
+  setRole: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  setIsAuthenticated: () => {},
+  role: null,
+  setRole: () => {},
+});
+
+// AuthProvider component
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = Cookies.get('access_token');
+    if (token) {
+      setIsAuthenticated(true);
+      setRole(Cookies.get('role') || null);
+    }
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated,  setIsAuthenticated, role, setRole }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 
-เอา access token ไป set ลงใน cookie
+frontend\src\pages\RootPage.tsx <-- นี่คือหน้า rootpage หน้าเเรกที่จะต้องเจอตอนเข้าเว็บครั้งเเรก เป็นหน้าที่ไว้ redirect คนที่เข้าไปหน้าอื่นๆ ต่อไป
+มันจะอ่าน role ใน cookie เเล้ว redirect ไปหาหน้า homepage ของเเต่ละ role
 
+รายการ homepage เเต่ละ role
+frontend\src\pages\homes\BasetypeAdminHome.tsx
+frontend\src\pages\homes\HrAdminHome.tsx
+frontend\src\pages\homes\OrganizationAdminHome.tsx
+frontend\src\pages\homes\OrganizationUserHome.tsx
+frontend\src\pages\homes\PersonUserHome.tsx
+frontend\src\pages\homes\SystemAdminHome.tsx
 
-frontend\src\pages\RootPage.tsx <-- นี่คือหน้า rootpage หน้าเเรกที่จะต้องเจอตอนเข้าเว็บครั้งเเรก 
-ถ้าไม่เคย login จะส่งไปหาหน้า login
-ถ้า
-ถ้าเคย
+ทุกๆ หน้าที่ทำ ใช้ ThemeContext นี้นะ 
+frontend\src\contexts\ThemeContext.tsx
+// contexts/ThemeContext.tsx
+
+// Import necessary React hooks and MUI components
+import { createContext, useContext, useState, useMemo } from 'react';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material';
+// Import theme configurations
+import { lightTheme, darkTheme } from '../styles/theme';
+
+// Define the shape (type) of our theme context
+type ThemeContextType = {
+  toggleTheme: () => void;    // Function to switch between themes
+  isDarkMode: boolean;        // Current theme status (true = dark, false = light)
+};
+
+// Create context with default values
+const ThemeContext = createContext<ThemeContextType>({
+  toggleTheme: () => {},      // Empty default toggle function
+  isDarkMode: false,          // Default to light theme
+});
+
+// Custom hook to easily access theme context
+export const useTheme = () => useContext(ThemeContext);
+
+// Theme provider component (wrap around your app)
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  // State to track dark mode status
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Memoize theme object to prevent unnecessary recalculations
+  const theme = useMemo(() => 
+    isDarkMode ? darkTheme : lightTheme,  // Choose theme based on mode
+    [isDarkMode]                          // Recalculate only when mode changes
+  );
+
+  // Function to toggle between dark/light modes
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);  // Flip current state
+  };
+
+  return (
+    // Provide theme context to child components
+    <ThemeContext.Provider value={{ toggleTheme, isDarkMode }}>
+      {/* Apply MUI theme to all children */}
+      <MuiThemeProvider theme={theme}>
+        {children}
+      </MuiThemeProvider>
+    </ThemeContext.Provider>
+  );
+};

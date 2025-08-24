@@ -50,26 +50,26 @@ export default function OrganizationUserHome() {
   const theme = useTheme();
 
   // Check token and role from cookie
-  useEffect(() => {
-    const checkTokenValidity = async () => {
-      const token = Cookies.get('access_token');
-      const role = Cookies.get('role'); // Get role from cookie
-      if (!isAuthenticated || !token || role !== "organization_user") {
-        console.log('Invalid token or role, redirecting to login');
-        logout();
-        navigate("/login/organization", { replace: true });
-        return;
-      }
-      try {
-        await getOrganizationProfile();
-      } catch (err: any) {
-        console.error('Token validation failed:', err.message);
-        logout();
-        navigate("/login/organization", { replace: true });
-      }
-    };
-    checkTokenValidity();
-  }, [logout, navigate, isAuthenticated]);
+  // useEffect(() => {
+  //   const checkTokenValidity = async () => {
+  //     const token = Cookies.get('access_token');
+  //     const role = Cookies.get('role'); // Get role from cookie
+  //     if (!isAuthenticated || !token || role !== "organization_user") {
+  //       console.log('Invalid token or role, redirecting to login');
+  //       logout();
+  //       navigate("/login/organization", { replace: true });
+  //       return;
+  //     }
+  //     try {
+  //       await getOrganizationProfile();
+  //     } catch (err: any) {
+  //       console.error('Token validation failed:', err.message);
+  //       logout();
+  //       navigate("/login/organization", { replace: true });
+  //     }
+  //   };
+  //   checkTokenValidity();
+  // }, [logout, navigate, isAuthenticated]);
 
   // Render service grid
   const renderServiceGrid = (serviceItems: { name: string; path: string }[]) => (

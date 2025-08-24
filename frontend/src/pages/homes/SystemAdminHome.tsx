@@ -53,39 +53,38 @@ const navItems = [
 ];
 
 export default function SystemAdminHome() {
-  const { isAuthenticated, logout, role } = useContext(AuthContext);
-  const navigate = useNavigate();
+  
   const theme = useTheme();
 
   // ตรวจสอบ token และ role
-  useEffect(() => {
-    const checkTokenValidity = async () => {
-      // ตรวจสอบว่า isAuthenticated และ role ถูกต้อง
-      if (!isAuthenticated || role !== "system_admin") {
-        logout();
-        navigate("/login/admin", { replace: true });
-        return;
-      }
+  // useEffect(() => {
+  //   const checkTokenValidity = async () => {
+  //     // ตรวจสอบว่า isAuthenticated และ role ถูกต้อง
+  //     if (!isAuthenticated || role !== "system_admin") {
+  //       logout();
+  //       navigate("/login/admin", { replace: true });
+  //       return;
+  //     }
 
-      // ตรวจสอบว่ามี token ใน cookie
-      const token = Cookies.get('access_token');
-      if (!token) {
-        console.error('No access token found in cookies');
-        logout();
-        navigate("/login/admin", { replace: true });
-        return;
-      }
+  //     // ตรวจสอบว่ามี token ใน cookie
+  //     const token = Cookies.get('access_token');
+  //     if (!token) {
+  //       console.error('No access token found in cookies');
+  //       logout();
+  //       navigate("/login/admin", { replace: true });
+  //       return;
+  //     }
 
-      try {
-        await getAdminProfile(); // เรียก API เพื่อตรวจสอบ token
-      } catch (err: any) {
-        console.error('Token validation failed:', err.message);
-        logout();
-        navigate("/login/admin", { replace: true });
-      }
-    };
-    checkTokenValidity();
-  }, [isAuthenticated, role, logout, navigate]);
+  //     try {
+  //       await getAdminProfile(); // เรียก API เพื่อตรวจสอบ token
+  //     } catch (err: any) {
+  //       console.error('Token validation failed:', err.message);
+  //       logout();
+  //       navigate("/login/admin", { replace: true });
+  //     }
+  //   };
+  //   checkTokenValidity();
+  // }, [isAuthenticated, role, logout, navigate]);
 
   // แสดง grid ของ services
   const renderServiceGrid = (serviceItems: { name: string; path: string }[]) => (
