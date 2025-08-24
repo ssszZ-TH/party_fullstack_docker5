@@ -267,28 +267,30 @@ async def delete_person(person_id: int, action_by: Optional[int]) -> Optional[in
         if not old_data:
             return None
 
+        # Log history before deleting the person
+        await log_person_history(
+            person_id=person_id,
+            personal_id_number=old_data.personal_id_number,
+            first_name=old_data.first_name,
+            middle_name=old_data.middle_name,
+            last_name=old_data.last_name,
+            nick_name=old_data.nick_name,
+            birth_date=old_data.birth_date,
+            gender_type_id=old_data.gender_type_id,
+            marital_status_type_id=old_data.marital_status_type_id,
+            country_id=old_data.country_id,
+            height=old_data.height,
+            weight=old_data.weight,
+            racial_type_id=old_data.racial_type_id,
+            income_range_id=old_data.income_range_id,
+            about_me=old_data.about_me,
+            action="delete",
+            action_by=action_by
+        )
+
         query = "DELETE FROM persons WHERE id = :id RETURNING id"
         result = await database.fetch_one(query=query, values={"id": person_id})
         if result:
-            await log_person_history(
-                person_id=person_id,
-                personal_id_number=old_data.personal_id_number,
-                first_name=old_data.first_name,
-                middle_name=old_data.middle_name,
-                last_name=old_data.last_name,
-                nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,
-                gender_type_id=old_data.gender_type_id,
-                marital_status_type_id=old_data.marital_status_type_id,
-                country_id=old_data.country_id,
-                height=old_data.height,
-                weight=old_data.weight,
-                racial_type_id=old_data.racial_type_id,
-                income_range_id=old_data.income_range_id,
-                about_me=old_data.about_me,
-                action="delete",
-                action_by=action_by
-            )
             logger.info(f"Deleted person: id={person_id}")
             return result["id"]
         return None

@@ -209,21 +209,23 @@ async def delete_organization(organization_id: int, action_by: Optional[int]) ->
         if not old_data:
             return None
 
+        # Log history before deleting the organization
+        await log_organization_history(
+            organization_id=organization_id,
+            federal_tax_id=old_data.federal_tax_id,
+            name_en=old_data.name_en,
+            name_th=old_data.name_th,
+            organization_type_id=old_data.organization_type_id,
+            industry_type_id=old_data.industry_type_id,
+            employee_count=old_data.employee_count,
+            slogan=old_data.slogan,
+            action="delete",
+            action_by=action_by
+        )
+
         query = "DELETE FROM organizations WHERE id = :id RETURNING id"
         result = await database.fetch_one(query=query, values={"id": organization_id})
         if result:
-            await log_organization_history(
-                organization_id=organization_id,
-                federal_tax_id=old_data.federal_tax_id,
-                name_en=old_data.name_en,
-                name_th=old_data.name_th,
-                organization_type_id=old_data.organization_type_id,
-                industry_type_id=old_data.industry_type_id,
-                employee_count=old_data.employee_count,
-                slogan=old_data.slogan,
-                action="delete",
-                action_by=action_by
-            )
             logger.info(f"Deleted organization: id={organization_id}")
             return result["id"]
         return None
