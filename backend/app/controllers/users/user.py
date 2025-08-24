@@ -35,6 +35,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         logger.error(f"JWT decode failed: {str(e)}")
         raise HTTPException(status_code=401, detail="Invalid token")
 
+# ดึง role ของผู้ใช้ปัจจุบัน
+@router.get("/myrole")
+async def get_user_role(current_user: dict = Depends(get_current_user)):
+    logger.info(f"Retrieved role for user: id={current_user['id']}, role={current_user['role']}")
+    return {"role": current_user["role"]}
+
 # สร้างผู้ใช้ใหม่ (system_admin เท่านั้น)
 @router.post("/", response_model=UserOut)
 async def create_user_endpoint(user: UserCreate, current_user: dict = Depends(get_current_user)):

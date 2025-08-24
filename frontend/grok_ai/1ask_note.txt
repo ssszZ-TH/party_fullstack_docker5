@@ -1,0 +1,127 @@
+นี่คือ main page เอาไว้สำหรับเป็น router
+
+frontend\src\main.tsx
+
+import React, { lazy, Suspense } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Loading from "./components/Loading";
+
+// Lazy load pages เพื่อเพิ่มประสิทธิภาพ
+
+
+interface ProtectedRoute {
+  path: string;
+  component: React.LazyExoticComponent<React.FC>;
+}
+
+interface UnprotectedRoute {
+  path: string;
+  component: React.LazyExoticComponent<React.FC>;
+}
+
+// กำหนด array ของ routes สำหรับหน้าเพิ่มเติม
+const protectedroutes: ProtectedRoute[] = [
+  
+];
+
+
+// กำหนด array ของ routes สำหรับหน้าเพิ่มเติม
+const unprotectedroutes: UnprotectedRoute[] = [
+  {path:"/app", component: lazy(() => import("./App"))}
+];
+
+// Render แอปพลิเคชัน
+createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              {/* unprotected routes */}
+              
+              
+              {unprotectedroutes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                      <route.component />
+                  }
+                />
+              ))}
+
+              {protectedroutes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                    <ProtectedRoute>
+                      <route.component />
+                    </ProtectedRoute>
+                  }
+                />
+              ))}
+              <Route path="*" element={<h1>404 Not Found</h1>} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
+  </React.StrictMode>
+);
+
+frontend\src\pages\login\Login.tsx <-- ใน file นี้ ช่วยทำ login page ให้หน่อย
+
+frontend\src\pages\register\Register.tsx <-- ช่วยทำ register page ให้หน่อย
+
+frontend\src\services\auth.ts <-- เป็น file ที่ไว้รวบรวม function ที่ต้องไปต่อกับ backend
+
+สิ่งที่อยู่ใน file
+import axios from 'axios';
+import Cookies from 'js-cookie';
+const BASE_URL = 'http://localhost:8080';
+
+นี่คือ part ที่ไว้สำหรับ login register ผมจะเอาผลการ test ด้วย postman มาให้นะ
+
+POST {{backend}}/auth/register
+{
+    "username": "sysadmin1",
+    "email": "sysadmin1@example.com",
+    "password": "securepass123",
+    "role": "system_admin"
+}
+{
+    "id": 1,
+    "username": "sysadmin1",
+    "email": "sysadmin1@example.com",
+    "role": "system_admin",
+    "created_at": "2025-08-23T12:11:06.431250",
+    "updated_at": null
+}
+
+POST {{backend}}/auth/login
+{
+    "email": "sysadmin1@example.com",
+    "password": "securepass123"
+}
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6InN5c3RlbV9hZG1pbiIsImV4cCI6MTc1NjAzNzcxMH0.i79jAfE96fq1bN1WdnRDHmybwvx-wER6czoE3seKUSc",
+    "token_type": "bearer"
+}
+
+พอ login เสร็จได้ access token
+เอา access token ไป get role
+
+
+เอา access token ไป set ลงใน cookie
+
+
+frontend\src\pages\RootPage.tsx <-- นี่คือหน้า rootpage หน้าเเรกที่จะต้องเจอตอนเข้าเว็บครั้งเเรก 
+ถ้าไม่เคย login จะส่งไปหาหน้า login
+ถ้า
+ถ้าเคย
