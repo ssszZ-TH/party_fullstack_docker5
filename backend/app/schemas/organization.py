@@ -17,6 +17,9 @@ class OrganizationCreate(BaseModel):
 
 # Schema สำหรับอัปเดต organization
 class OrganizationUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
     federal_tax_id: Optional[str] = None
     name_en: Optional[str] = None
     name_th: Optional[str] = None

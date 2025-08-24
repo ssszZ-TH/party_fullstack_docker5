@@ -244,6 +244,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         if not old_data:
             return None
 
+        user_result = None
         if user_query_parts:
             user_update = UserUpdate(
                 username=person.username,
@@ -257,8 +258,8 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
                 return None
             await log_user_history(
                 user_id=person_id,
-                username=old_data.username,
-                email=old_data.email,
+                username=user_result.username if user_result else old_data.username,
+                email=user_result.email if user_result else old_data.email,
                 password=hashed_password if hashed_password else (await get_user_password(person_id)),
                 role="person_user",
                 action="update",
@@ -285,27 +286,27 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         if result:
             await log_person_history(
                 person_id=person_id,
-                personal_id_number=old_data.personal_id_number,
-                first_name=old_data.first_name,
-                middle_name=old_data.middle_name,
-                last_name=old_data.last_name,
-                nick_name=old_data.nick_name,
-                birth_date=old_data.birth_date,
-                gender_type_id=old_data.gender_type_id,
-                marital_status_type_id=old_data.marital_status_type_id,
-                country_id=old_data.country_id,
-                height=old_data.height,
-                weight=old_data.weight,
-                racial_type_id=old_data.racial_type_id,
-                income_range_id=old_data.income_range_id,
-                about_me=old_data.about_me,
+                personal_id_number=person.personal_id_number if person.personal_id_number is not None else old_data.personal_id_number,
+                first_name=person.first_name if person.first_name is not None else old_data.first_name,
+                middle_name=person.middle_name if person.middle_name is not None else old_data.middle_name,
+                last_name=person.last_name if person.last_name is not None else old_data.last_name,
+                nick_name=person.nick_name if person.nick_name is not None else old_data.nick_name,
+                birth_date=person.birth_date if person.birth_date is not None else old_data.birth_date,
+                gender_type_id=person.gender_type_id if person.gender_type_id is not None else old_data.gender_type_id,
+                marital_status_type_id=person.marital_status_type_id if person.marital_status_type_id is not None else old_data.marital_status_type_id,
+                country_id=person.country_id if person.country_id is not None else old_data.country_id,
+                height=person.height if person.height is not None else old_data.height,
+                weight=person.weight if person.weight is not None else old_data.weight,
+                racial_type_id=person.racial_type_id if person.racial_type_id is not None else old_data.racial_type_id,
+                income_range_id=person.income_range_id if person.income_range_id is not None else old_data.income_range_id,
+                about_me=person.about_me if person.about_me is not None else old_data.about_me,
                 action="update",
                 action_by=action_by
             )
             logger.info(f"Updated person: id={person_id}")
             return PersonOut(
-                username=user_result.username if user_result else old_data.username,
-                email=user_result.email if user_result else old_data.email,
+                username=old_data.username if not user_result else user_result.username,
+                email=old_data.email if not user_result else user_result.email,
                 **result._mapping
             )
         return None

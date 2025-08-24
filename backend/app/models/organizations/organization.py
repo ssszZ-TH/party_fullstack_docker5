@@ -194,6 +194,7 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         if not old_data:
             return None
 
+        user_result = None
         if user_query_parts:
             user_update = UserUpdate(
                 username=organization.username,
@@ -207,8 +208,8 @@ async def update_organization(organization_id: int, organization: OrganizationUp
                 return None
             await log_user_history(
                 user_id=organization_id,
-                username=old_data.username,
-                email=old_data.email,
+                username=user_result.username if user_result else old_data.username,
+                email=user_result.email if user_result else old_data.email,
                 password=hashed_password if hashed_password else (await get_user_password(organization_id)),
                 role="organization_user",
                 action="update",
@@ -234,20 +235,20 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         if result:
             await log_organization_history(
                 organization_id=organization_id,
-                federal_tax_id=old_data.federal_tax_id,
-                name_en=old_data.name_en,
-                name_th=old_data.name_th,
-                organization_type_id=old_data.organization_type_id,
-                industry_type_id=old_data.industry_type_id,
-                employee_count=old_data.employee_count,
-                slogan=old_data.slogan,
+                federal_tax_id=organization.federal_tax_id if organization.federal_tax_id is not None else old_data.federal_tax_id,
+                name_en=organization.name_en if organization.name_en is not None else old_data.name_en,
+                name_th=organization.name_th if organization.name_th is not None else old_data.name_th,
+                organization_type_id=organization.organization_type_id if organization.organization_type_id is not None else old_data.organization_type_id,
+                industry_type_id=organization.industry_type_id if organization.industry_type_id is not None else old_data.industry_type_id,
+                employee_count=organization.employee_count if organization.employee_count is not None else old_data.employee_count,
+                slogan=organization.slogan if organization.slogan is not None else old_data.slogan,
                 action="update",
                 action_by=action_by
             )
             logger.info(f"Updated organization: id={organization_id}")
             return OrganizationOut(
-                username=user_result.username if user_result else old_data.username,
-                email=user_result.email if user_result else old_data.email,
+                username=old_data.username if not user_result else user_result.username,
+                email=old_data.email if not user_result else user_result.email,
                 **result._mapping
             )
         return None

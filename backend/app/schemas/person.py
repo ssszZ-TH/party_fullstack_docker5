@@ -24,6 +24,9 @@ class PersonCreate(BaseModel):
 
 # Schema สำหรับอัปเดต person
 class PersonUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
     personal_id_number: Optional[str] = None
     first_name: Optional[str] = None
     middle_name: Optional[str] = None
