@@ -1,5 +1,4 @@
 from app.config.database import database
-from app.config.settings import BCRYPT_SALT
 from app.schemas.person import PersonCreate, PersonUpdate, PersonOut
 from app.models.users.user import create_user, log_user_history, update_user, delete_user, get_user_password
 from app.schemas.user import UserCreate, UserUpdate
@@ -94,9 +93,10 @@ async def log_person_history(person_id: int, personal_id_number: str, first_name
 async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optional[PersonOut]:
     async with database.transaction():
         try:
-            hashed_password = bcrypt.hashpw(person.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
-            user = UserCreate(username=person.username, email=person.email, password=hashed_password, role="person_user")
+            user = UserCreate(username=person.username, email=person.email, password=person.password, role="person_user")
+            ## create_user จะ hash password เอง เราไม่ต้องไปทำให้มัน
             user_result = await create_user(user, action_by)
+            
             if not user_result:
                 logger.warning(f"Failed to create user for person: {person.email}")
                 return None
@@ -117,6 +117,8 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
                           gender_type_id, marital_status_type_id, country_id, height, weight, racial_type_id, 
                           income_range_id, about_me, created_at, updated_at
             """
+
+            ## user_result.id คือ id ของ supertype จะเอาไปสร้าง subtype
             values = {
                 "id": user_result.id,
                 "personal_id_number": person.personal_id_number,
@@ -156,15 +158,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
                     action="create",
                     action_by=action_by
                 )
-                await log_user_history(
-                    user_id=user_result.id,
-                    username=user_result.username,
-                    email=user_result.email,
-                    password=hashed_password,
-                    role=user_result.role,
-                    action="create",
-                    action_by=action_by
-                )
+                
                 logger.info(f"Created person: id={user_result.id}")
                 return PersonOut(
                     username=user_result.username,
@@ -228,7 +222,6 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         # Update user table if username, email, or password is provided
         user_values = {"id": person_id}
         user_query_parts = []
-        hashed_password = None
         if person.username is not None:
             user_query_parts.append("username = :username")
             user_values["username"] = person.username
@@ -236,11 +229,12 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             user_query_parts.append("email = :email")
             user_values["email"] = person.email
         if person.password is not None:
-            hashed_password = bcrypt.hashpw(person.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
             user_query_parts.append("password = :password")
-            user_values["password"] = hashed_password
+            # ไม่ต้อง hash password ตอน update_user เดี๋ยวมัน hash ให้เราเอง
+            user_values["password"] = person.password
 
         old_data = await get_person(person_id)
+        # update ตัวที่ไม่มีอยู่จริง ให้ return none ไปเลย
         if not old_data:
             return None
 
@@ -249,22 +243,15 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             user_update = UserUpdate(
                 username=person.username,
                 email=person.email,
-                password=hashed_password,
+                password=person.password,
                 role=None
             )
-            user_result = await update_user(person_id, user_update, action_by)
+            user_result = await update_user(user_update, action_by)
             if not user_result:
                 logger.warning(f"Failed to update user for person: id={person_id}")
                 return None
-            await log_user_history(
-                user_id=person_id,
-                username=user_result.username if user_result else old_data.username,
-                email=user_result.email if user_result else old_data.email,
-                password=hashed_password if hashed_password else (await get_user_password(person_id)),
-                role="person_user",
-                action="update",
-                action_by=action_by
-            )
+            
+            ## ไม่ต้องไป log user history เพราะตอน update_user มัน log ให้เเล้ว
 
         if not query_parts and not user_query_parts:
             logger.info(f"No fields to update for person id={person_id}")

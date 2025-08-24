@@ -81,8 +81,8 @@ async def log_organization_history(organization_id: int, federal_tax_id: Optiona
 async def create_organization(organization: OrganizationCreate, action_by: Optional[int]) -> Optional[OrganizationOut]:
     async with database.transaction():
         try:
-            hashed_password = bcrypt.hashpw(organization.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
-            user = UserCreate(username=organization.username, email=organization.email, password=hashed_password, role="organization_user")
+            user = UserCreate(username=organization.username, email=organization.email, password=organization.password, role="organization_user")
+            # create_user จะ hash password เอง เราไม่ต้องไปทำให้มัน
             user_result = await create_user(user, action_by)
             if not user_result:
                 logger.warning(f"Failed to create user for organization: {organization.email}")
@@ -127,15 +127,7 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
                     action="create",
                     action_by=action_by
                 )
-                await log_user_history(
-                    user_id=user_result.id,
-                    username=user_result.username,
-                    email=user_result.email,
-                    password=hashed_password,
-                    role=user_result.role,
-                    action="create",
-                    action_by=action_by
-                )
+                # ไม่ต้องไป log user history เพราะตอน create_user มัน log ให้แล้ว
                 logger.info(f"Created organization: id={user_result.id}")
                 return OrganizationOut(
                     username=user_result.username,
@@ -178,7 +170,6 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         # Update user table if username, email, or password is provided
         user_values = {"id": organization_id}
         user_query_parts = []
-        hashed_password = None
         if organization.username is not None:
             user_query_parts.append("username = :username")
             user_values["username"] = organization.username
@@ -186,11 +177,12 @@ async def update_organization(organization_id: int, organization: OrganizationUp
             user_query_parts.append("email = :email")
             user_values["email"] = organization.email
         if organization.password is not None:
-            hashed_password = bcrypt.hashpw(organization.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
             user_query_parts.append("password = :password")
-            user_values["password"] = hashed_password
+            # password ไม่ต้อง hash ตอน update_user เดี๋ยวมัน hash ให้เราเอง
+            user_values["password"] = organization.password
 
         old_data = await get_organization(organization_id)
+        # update ตัวที่ไม่มีอยู่จริง ให้ return none ไปเลย
         if not old_data:
             return None
 
@@ -199,22 +191,14 @@ async def update_organization(organization_id: int, organization: OrganizationUp
             user_update = UserUpdate(
                 username=organization.username,
                 email=organization.email,
-                password=hashed_password,
+                password=organization.password,
                 role=None
             )
-            user_result = await update_user(organization_id, user_update, action_by)
+            user_result = await update_user(user_update, action_by)
             if not user_result:
                 logger.warning(f"Failed to update user for organization: id={organization_id}")
                 return None
-            await log_user_history(
-                user_id=organization_id,
-                username=user_result.username if user_result else old_data.username,
-                email=user_result.email if user_result else old_data.email,
-                password=hashed_password if hashed_password else (await get_user_password(organization_id)),
-                role="organization_user",
-                action="update",
-                action_by=action_by
-            )
+            # ไม่ต้อง log user history เพราะ update_user จะทำการ log history ให้เอง
 
         if not query_parts and not user_query_parts:
             logger.info(f"No fields to update for organization id={organization_id}")
