@@ -1,7 +1,7 @@
 from app.config.database import database
 from app.config.settings import BCRYPT_SALT
 from app.schemas.person import PersonCreate, PersonUpdate, PersonOut
-from app.models.users.user import create_user, log_user_history, update_user, delete_user
+from app.models.users.user import create_user, log_user_history, update_user, delete_user, get_user_password
 from app.schemas.user import UserCreate, UserUpdate
 import bcrypt
 import logging
@@ -94,7 +94,8 @@ async def log_person_history(person_id: int, personal_id_number: str, first_name
 async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optional[PersonOut]:
     async with database.transaction():
         try:
-            user = UserCreate(username=person.username, email=person.email, password=person.password, role="person_user")
+            hashed_password = bcrypt.hashpw(person.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
+            user = UserCreate(username=person.username, email=person.email, password=hashed_password, role="person_user")
             user_result = await create_user(user, action_by)
             if not user_result:
                 logger.warning(f"Failed to create user for person: {person.email}")
@@ -159,6 +160,7 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
                     user_id=user_result.id,
                     username=user_result.username,
                     email=user_result.email,
+                    password=hashed_password,
                     role=user_result.role,
                     action="create",
                     action_by=action_by
@@ -226,6 +228,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         # Update user table if username, email, or password is provided
         user_values = {"id": person_id}
         user_query_parts = []
+        hashed_password = None
         if person.username is not None:
             user_query_parts.append("username = :username")
             user_values["username"] = person.username
@@ -245,7 +248,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             user_update = UserUpdate(
                 username=person.username,
                 email=person.email,
-                password=person.password,
+                password=hashed_password,
                 role=None
             )
             user_result = await update_user(person_id, user_update, action_by)
@@ -256,6 +259,7 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
                 user_id=person_id,
                 username=old_data.username,
                 email=old_data.email,
+                password=hashed_password if hashed_password else (await get_user_password(person_id)),
                 role="person_user",
                 action="update",
                 action_by=action_by
@@ -333,11 +337,13 @@ async def delete_person(person_id: int, action_by: Optional[int]) -> Optional[in
             action="delete",
             action_by=action_by
         )
+        old_user_data = await database.fetch_one(query="SELECT username, email, password, role FROM users WHERE id = :id", values={"id": person_id})
         await log_user_history(
             user_id=person_id,
-            username=old_data.username,
-            email=old_data.email,
-            role="person_user",
+            username=old_user_data["username"],
+            email=old_user_data["email"],
+            password=old_user_data["password"],
+            role=old_user_data["role"],
             action="delete",
             action_by=action_by
         )
