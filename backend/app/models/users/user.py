@@ -159,18 +159,20 @@ async def delete_user(user_id: int, action_by: Optional[int]) -> Optional[int]:
         if not old_password:
             return None
 
+        # Log history before deleting the user
+        await log_user_history(
+            user_id=user_id,
+            username=old_data.username,
+            email=old_data.email,
+            password=old_password,
+            role=old_data.role,
+            action="delete",
+            action_by=action_by
+        )
+
         query = "DELETE FROM users WHERE id = :id RETURNING id"
         result = await database.fetch_one(query=query, values={"id": user_id})
         if result:
-            await log_user_history(
-                user_id=user_id,
-                username=old_data.username,
-                email=old_data.email,
-                password=old_password,
-                role=old_data.role,
-                action="delete",
-                action_by=action_by
-            )
             logger.info(f"Deleted user: id={user_id}")
             return result["id"]
         return None
