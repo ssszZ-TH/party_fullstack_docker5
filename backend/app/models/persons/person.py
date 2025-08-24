@@ -1,8 +1,8 @@
 from app.config.database import database
 from app.config.settings import BCRYPT_SALT
 from app.schemas.person import PersonCreate, PersonUpdate, PersonOut
-from app.models.users.user import create_user, log_user_history
-from app.schemas.user import UserCreate
+from app.models.users.user import create_user, log_user_history, update_user, delete_user
+from app.schemas.user import UserCreate, UserUpdate
 import bcrypt
 import logging
 from typing import Optional, List
@@ -155,6 +155,14 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
                     action="create",
                     action_by=action_by
                 )
+                await log_user_history(
+                    user_id=user_result.id,
+                    username=user_result.username,
+                    email=user_result.email,
+                    role=user_result.role,
+                    action="create",
+                    action_by=action_by
+                )
                 logger.info(f"Created person: id={user_result.id}")
                 return PersonOut(
                     username=user_result.username,
@@ -215,23 +223,61 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             query_parts.append("about_me = :about_me")
             values["about_me"] = person.about_me
 
-        if not query_parts:
-            logger.info(f"No fields to update for person id={person_id}")
-            return None
+        # Update user table if username, email, or password is provided
+        user_values = {"id": person_id}
+        user_query_parts = []
+        if person.username is not None:
+            user_query_parts.append("username = :username")
+            user_values["username"] = person.username
+        if person.email is not None:
+            user_query_parts.append("email = :email")
+            user_values["email"] = person.email
+        if person.password is not None:
+            hashed_password = bcrypt.hashpw(person.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
+            user_query_parts.append("password = :password")
+            user_values["password"] = hashed_password
 
         old_data = await get_person(person_id)
         if not old_data:
             return None
 
-        query = f"""
-            UPDATE persons
-            SET {', '.join(query_parts)}, updated_at = :updated_at
-            WHERE id = :id
-            RETURNING id, personal_id_number, first_name, middle_name, last_name, nick_name, birth_date, 
-                      gender_type_id, marital_status_type_id, country_id, height, weight, racial_type_id, 
-                      income_range_id, about_me, created_at, updated_at
-        """
-        result = await database.fetch_one(query=query, values=values)
+        if user_query_parts:
+            user_update = UserUpdate(
+                username=person.username,
+                email=person.email,
+                password=person.password,
+                role=None
+            )
+            user_result = await update_user(person_id, user_update, action_by)
+            if not user_result:
+                logger.warning(f"Failed to update user for person: id={person_id}")
+                return None
+            await log_user_history(
+                user_id=person_id,
+                username=old_data.username,
+                email=old_data.email,
+                role="person_user",
+                action="update",
+                action_by=action_by
+            )
+
+        if not query_parts and not user_query_parts:
+            logger.info(f"No fields to update for person id={person_id}")
+            return None
+
+        if query_parts:
+            query = f"""
+                UPDATE persons
+                SET {', '.join(query_parts)}, updated_at = :updated_at
+                WHERE id = :id
+                RETURNING id, personal_id_number, first_name, middle_name, last_name, nick_name, birth_date, 
+                          gender_type_id, marital_status_type_id, country_id, height, weight, racial_type_id, 
+                          income_range_id, about_me, created_at, updated_at
+            """
+            result = await database.fetch_one(query=query, values=values)
+        else:
+            result = old_data
+
         if result:
             await log_person_history(
                 person_id=person_id,
@@ -254,8 +300,8 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
             )
             logger.info(f"Updated person: id={person_id}")
             return PersonOut(
-                username=old_data.username,
-                email=old_data.email,
+                username=user_result.username if user_result else old_data.username,
+                email=user_result.email if user_result else old_data.email,
                 **result._mapping
             )
         return None
@@ -287,10 +333,18 @@ async def delete_person(person_id: int, action_by: Optional[int]) -> Optional[in
             action="delete",
             action_by=action_by
         )
+        await log_user_history(
+            user_id=person_id,
+            username=old_data.username,
+            email=old_data.email,
+            role="person_user",
+            action="delete",
+            action_by=action_by
+        )
 
-        query = "DELETE FROM persons WHERE id = :id RETURNING id"
-        result = await database.fetch_one(query=query, values={"id": person_id})
+        # Delete from users table (supertype) to cascade to persons table
+        result = await delete_user(person_id, action_by)
         if result:
             logger.info(f"Deleted person: id={person_id}")
-            return result["id"]
+            return result
         return None

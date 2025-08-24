@@ -1,8 +1,8 @@
 from app.config.database import database
 from app.config.settings import BCRYPT_SALT
 from app.schemas.organization import OrganizationCreate, OrganizationUpdate, OrganizationOut
-from app.models.users.user import create_user, log_user_history
-from app.schemas.user import UserCreate
+from app.models.users.user import create_user, log_user_history, update_user, delete_user
+from app.schemas.user import UserCreate, UserUpdate
 import bcrypt
 import logging
 from typing import Optional, List
@@ -126,6 +126,14 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
                     action="create",
                     action_by=action_by
                 )
+                await log_user_history(
+                    user_id=user_result.id,
+                    username=user_result.username,
+                    email=user_result.email,
+                    role=user_result.role,
+                    action="create",
+                    action_by=action_by
+                )
                 logger.info(f"Created organization: id={user_result.id}")
                 return OrganizationOut(
                     username=user_result.username,
@@ -165,22 +173,60 @@ async def update_organization(organization_id: int, organization: OrganizationUp
             query_parts.append("slogan = :slogan")
             values["slogan"] = organization.slogan
 
-        if not query_parts:
-            logger.info(f"No fields to update for organization id={organization_id}")
-            return None
+        # Update user table if username, email, or password is provided
+        user_values = {"id": organization_id}
+        user_query_parts = []
+        if organization.username is not None:
+            user_query_parts.append("username = :username")
+            user_values["username"] = organization.username
+        if organization.email is not None:
+            user_query_parts.append("email = :email")
+            user_values["email"] = organization.email
+        if organization.password is not None:
+            hashed_password = bcrypt.hashpw(organization.password.encode('utf-8'), BCRYPT_SALT.encode('utf-8')).decode('utf-8')
+            user_query_parts.append("password = :password")
+            user_values["password"] = hashed_password
 
         old_data = await get_organization(organization_id)
         if not old_data:
             return None
 
-        query = f"""
-            UPDATE organizations
-            SET {', '.join(query_parts)}, updated_at = :updated_at
-            WHERE id = :id
-            RETURNING id, federal_tax_id, name_en, name_th, organization_type_id, industry_type_id, 
-                      employee_count, slogan, created_at, updated_at
-        """
-        result = await database.fetch_one(query=query, values=values)
+        if user_query_parts:
+            user_update = UserUpdate(
+                username=organization.username,
+                email=organization.email,
+                password=organization.password,
+                role=None
+            )
+            user_result = await update_user(organization_id, user_update, action_by)
+            if not user_result:
+                logger.warning(f"Failed to update user for organization: id={organization_id}")
+                return None
+            await log_user_history(
+                user_id=organization_id,
+                username=old_data.username,
+                email=old_data.email,
+                role="organization_user",
+                action="update",
+                action_by=action_by
+            )
+
+        if not query_parts and not user_query_parts:
+            logger.info(f"No fields to update for organization id={organization_id}")
+            return None
+
+        if query_parts:
+            query = f"""
+                UPDATE organizations
+                SET {', '.join(query_parts)}, updated_at = :updated_at
+                WHERE id = :id
+                RETURNING id, federal_tax_id, name_en, name_th, organization_type_id, industry_type_id, 
+                          employee_count, slogan, created_at, updated_at
+            """
+            result = await database.fetch_one(query=query, values=values)
+        else:
+            result = old_data
+
         if result:
             await log_organization_history(
                 organization_id=organization_id,
@@ -196,8 +242,8 @@ async def update_organization(organization_id: int, organization: OrganizationUp
             )
             logger.info(f"Updated organization: id={organization_id}")
             return OrganizationOut(
-                username=old_data.username,
-                email=old_data.email,
+                username=user_result.username if user_result else old_data.username,
+                email=user_result.email if user_result else old_data.email,
                 **result._mapping
             )
         return None
@@ -222,10 +268,18 @@ async def delete_organization(organization_id: int, action_by: Optional[int]) ->
             action="delete",
             action_by=action_by
         )
+        await log_user_history(
+            user_id=organization_id,
+            username=old_data.username,
+            email=old_data.email,
+            role="organization_user",
+            action="delete",
+            action_by=action_by
+        )
 
-        query = "DELETE FROM organizations WHERE id = :id RETURNING id"
-        result = await database.fetch_one(query=query, values={"id": organization_id})
+        # Delete from users table (supertype) to cascade to organizations table
+        result = await delete_user(organization_id, action_by)
         if result:
             logger.info(f"Deleted organization: id={organization_id}")
-            return result["id"]
+            return result
         return None
