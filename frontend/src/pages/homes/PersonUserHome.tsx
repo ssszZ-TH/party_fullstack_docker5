@@ -37,7 +37,7 @@ const services = [
 ];
 
 const navItems = [
-  { name: "Profile", icon: <PersonIcon />, path: "/v1/profile" },
+  { name: "Profile", icon: <PersonIcon />, path: "/profiles/person-user" },
   { name: "Settings", icon: <SettingsIcon />, path: "/v1/settings" },
   { name: "About", icon: <AboutIcon />, path: "/v1/about" },
   { name: "Tutorial", icon: <TutorialIcon />, path: "/v1/tutorial" },

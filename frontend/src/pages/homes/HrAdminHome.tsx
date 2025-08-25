@@ -40,7 +40,7 @@ const services = [
 ];
 
 const navItems = [
-  { name: "Profile", icon: <PersonIcon />, path: "/profiles/hr_admin" },
+  { name: "Profile", icon: <PersonIcon />, path: "/profiles/hr-admin" },
   { name: "Settings", icon: <SettingsIcon />, path: "/v1/settings" },
   { name: "About", icon: <AboutIcon />, path: "/v1/about" },
   { name: "Database", icon: <DatabaseIcon />, path: "/v1/database" },

@@ -36,7 +36,7 @@ const services = [
 ];
 
 const navItems = [
-  { name: "Profile", icon: <PersonIcon />, path: "/profiles/system_admin" },
+  { name: "Profile", icon: <PersonIcon />, path: "/profiles/system-admin" },
   { name: "Settings", icon: <SettingsIcon />, path: "/v1/settings" },
   { name: "About", icon: <AboutIcon />, path: "/v1/about" },
   { name: "Database", icon: <DatabaseIcon />, path: "/v1/database" },

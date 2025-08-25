@@ -23,6 +23,12 @@ const protectedroutes: ProtectedRoute[] = [
   { path: '/homes/organization-admin', component: lazy(() => import('./pages/homes/OrganizationAdminHome')) },
   { path: '/homes/organization-user', component: lazy(() => import('./pages/homes/OrganizationUserHome')) },
   { path: '/homes/person-user', component: lazy(() => import('./pages/homes/PersonUserHome')) },
+  { path: '/profiles/person-user', component: lazy(() => import('./pages/profiles/PersonUserProfile')) },
+  { path: '/profiles/hr-admin', component: lazy(() => import('./pages/profiles/HrAdminProfile')) },
+  { path: '/profiles/organization-admin', component: lazy(() => import('./pages/profiles/OrganizationAdminProfile')) },
+  { path: '/profiles/organization-user', component: lazy(() => import('./pages/profiles/OrganizationUserProfile')) },
+  { path: '/profiles/basetype-admin', component: lazy(() => import('./pages/profiles/BasetypeAdminProfile')) },
+  { path: '/profiles/system-admin', component: lazy(() => import('./pages/profiles/SystemAdminProfile')) },
 ];
 
 const unprotectedroutes: UnprotectedRoute[] = [
