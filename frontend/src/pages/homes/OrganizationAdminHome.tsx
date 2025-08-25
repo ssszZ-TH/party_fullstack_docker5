@@ -11,6 +11,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Paper,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -19,12 +20,10 @@ import {
   Storage as DatabaseIcon,
   School as TutorialIcon,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import { AuthContext } from "../../contexts/AuthContext";
-import { getAdminProfile } from "../../services/profile";
 import Cookies from 'js-cookie';
 
-// Services data for organization_admin
 const services = [
   {
     title: "Organization Management",
@@ -36,9 +35,8 @@ const services = [
   },
 ];
 
-// Navigation items
 const navItems = [
-  { name: "Profile", icon: <PersonIcon />, path: "/profiles/organization_admin" }, // อัปเดต path ไปยังหน้า profile ใหม่
+  { name: "Profile", icon: <PersonIcon />, path: "/profiles/organization_admin" },
   { name: "Settings", icon: <SettingsIcon />, path: "/v1/settings" },
   { name: "About", icon: <AboutIcon />, path: "/v1/about" },
   { name: "Database", icon: <DatabaseIcon />, path: "/v1/database" },
@@ -48,29 +46,8 @@ const navItems = [
 export default function OrganizationAdminHome() {
   const { isAuthenticated, logout, role } = useContext(AuthContext);
   const navigate = useNavigate();
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
-  // ตรวจสอบ token และ role
-  // useEffect(() => {
-  //   const checkTokenValidity = async () => {
-  //     const token = Cookies.get('access_token');
-  //     if (!isAuthenticated || !token || role !== "organization_admin") {
-  //       logout();
-  //       navigate("/login/admin", { replace: true });
-  //       return;
-  //     }
-  //     try {
-  //       await getAdminProfile();
-  //     } catch (err: any) {
-  //       console.error('Token validation failed:', err.message);
-  //       logout();
-  //       navigate("/login/admin", { replace: true });
-  //     }
-  //   };
-  //   checkTokenValidity();
-  // }, [logout, navigate, isAuthenticated, role]);
-
-  // แสดง grid ของ services
   const renderServiceGrid = (serviceItems: { name: string; path: string }[]) => (
     <Box
       sx={{
@@ -98,12 +75,17 @@ export default function OrganizationAdminHome() {
         >
           <Avatar
             src={`/home_thumbnail/${service.name.toLowerCase().replace(/\s+/g, "_")}.png`}
-            sx={{ width: 60, height: 60, mb: 0.5, borderRadius: "10%" }}
+            sx={{
+              width: 60,
+              height: 60,
+              mb: 0.5,
+              borderRadius: "10%",
+              bgcolor: 'background.paper',
+            }}
           />
           <Typography
             variant="body2"
             align="center"
-            color="text.primary"
             sx={{
               fontWeight: 500,
               fontSize: "0.75rem",
@@ -115,6 +97,7 @@ export default function OrganizationAdminHome() {
               width: "100%",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              color: 'text.primary',
             }}
           >
             {service.name}
@@ -125,13 +108,13 @@ export default function OrganizationAdminHome() {
   );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: 'background.default' }}>
       <Box
         sx={{
           width: 240,
           position: "fixed",
           height: "100vh",
-          bgcolor: "primary.light",
+          bgcolor: 'primary.main',
           boxShadow: 3,
           zIndex: 10,
         }}
@@ -140,19 +123,22 @@ export default function OrganizationAdminHome() {
           <img
             src="/sphere_wire_frame.svg"
             alt="Logo"
-            style={{ width: "100%", objectFit: "contain" }}
+            style={{ width: "100%", objectFit: "contain", filter: isDarkMode ? 'invert(1)' : 'none' }}
           />
         </Box>
-        <Divider />
+        <Divider sx={{ bgcolor: 'text.secondary' }} />
         <List>
           {navItems.map((item) => (
             <ListItem key={item.name} disablePadding>
               <ListItemButton
                 component={RouterLink}
                 to={item.path}
-                sx={{ "&:hover": { bgcolor: theme.palette.action.hover } }}
+                sx={{
+                  "&:hover": { bgcolor: 'action.hover' },
+                  color: 'text.primary',
+                }}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 40, color: 'text.primary' }}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.name} />
               </ListItemButton>
             </ListItem>
@@ -161,7 +147,7 @@ export default function OrganizationAdminHome() {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, ml: 30, position: "relative" }}
+        sx={{ flexGrow: 1, ml: 30, position: "relative", bgcolor: 'background.default' }}
       >
         <img
           src="/sphere_wire_frame.svg"
@@ -173,24 +159,26 @@ export default function OrganizationAdminHome() {
             height: "100vh",
             objectFit: "cover",
             zIndex: -1,
-            opacity: 0.2,
+            opacity: 0.1,
+            filter: isDarkMode ? 'invert(1)' : 'none',
           }}
         />
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <Typography variant="h4" gutterBottom>
-              Organization Admin Dashboard
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Manage organization users and data
-            </Typography>
-          </Box>
-          {services.map((section) => (
-            <Box key={section.title}>
-              {renderServiceGrid(section.items)}
-              <hr style={{ margin: "20px 0" }} />
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 2, bgcolor: 'background.paper' }}>
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Typography variant="h4" sx={{ color: 'text.primary' }} gutterBottom>
+                Organization Admin Dashboard
+              </Typography>
+              <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
+                Manage organization users and data
+              </Typography>
             </Box>
-          ))}
+            {services.map((section) => (
+              <Box key={section.title}>
+                {renderServiceGrid(section.items)}
+              </Box>
+            ))}
+          </Paper>
         </Container>
       </Box>
     </Box>

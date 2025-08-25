@@ -11,6 +11,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Paper,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -18,12 +19,10 @@ import {
   Info as AboutIcon,
   School as TutorialIcon,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import { AuthContext } from "../../contexts/AuthContext";
-import { getPersonProfile } from "../../services/profile";
 import Cookies from 'js-cookie';
 
-// Services data for person_user
 const services = [
   {
     title: "Personal Information",
@@ -37,7 +36,6 @@ const services = [
   },
 ];
 
-// Navigation items
 const navItems = [
   { name: "Profile", icon: <PersonIcon />, path: "/v1/profile" },
   { name: "Settings", icon: <SettingsIcon />, path: "/v1/settings" },
@@ -48,31 +46,8 @@ const navItems = [
 export default function PersonUserHome() {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
-  // Check token and role from cookie
-  // useEffect(() => {
-  //   const checkTokenValidity = async () => {
-  //     const token = Cookies.get('access_token');
-  //     const role = Cookies.get('role'); // Get role from cookie
-  //     if (!isAuthenticated || !token || role !== "person_user") {
-  //       console.log('Invalid token or role, redirecting to login');
-  //       logout();
-  //       navigate("/login/person", { replace: true });
-  //       return;
-  //     }
-  //     try {
-  //       await getPersonProfile();
-  //     } catch (err: any) {
-  //       console.error('Token validation failed:', err.message);
-  //       logout();
-  //       navigate("/login/person", { replace: true });
-  //     }
-  //   };
-  //   checkTokenValidity();
-  // }, [logout, navigate, isAuthenticated]);
-
-  // Render service grid
   const renderServiceGrid = (serviceItems: { name: string; path: string }[]) => (
     <Box
       sx={{
@@ -100,12 +75,17 @@ export default function PersonUserHome() {
         >
           <Avatar
             src={`/home_thumbnail/${service.name.toLowerCase().replace(/\s+/g, "_")}.png`}
-            sx={{ width: 60, height: 60, mb: 0.5, borderRadius: "10%" }}
+            sx={{
+              width: 60,
+              height: 60,
+              mb: 0.5,
+              borderRadius: "10%",
+              bgcolor: 'background.paper',
+            }}
           />
           <Typography
             variant="body2"
             align="center"
-            color="text.primary"
             sx={{
               fontWeight: 500,
               fontSize: "0.75rem",
@@ -117,6 +97,7 @@ export default function PersonUserHome() {
               width: "100%",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              color: 'text.primary',
             }}
           >
             {service.name}
@@ -127,13 +108,13 @@ export default function PersonUserHome() {
   );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: 'background.default' }}>
       <Box
         sx={{
           width: 240,
           position: "fixed",
           height: "100vh",
-          bgcolor: "primary.light",
+          bgcolor: 'primary.main',
           boxShadow: 3,
           zIndex: 10,
         }}
@@ -142,19 +123,22 @@ export default function PersonUserHome() {
           <img
             src="/sphere_wire_frame.svg"
             alt="Logo"
-            style={{ width: "100%", objectFit: "contain" }}
+            style={{ width: "100%", objectFit: "contain", filter: isDarkMode ? 'invert(1)' : 'none' }}
           />
         </Box>
-        <Divider />
+        <Divider sx={{ bgcolor: 'text.secondary' }} />
         <List>
           {navItems.map((item) => (
             <ListItem key={item.name} disablePadding>
               <ListItemButton
                 component={RouterLink}
                 to={item.path}
-                sx={{ "&:hover": { bgcolor: theme.palette.action.hover } }}
+                sx={{
+                  "&:hover": { bgcolor: 'action.hover' },
+                  color: 'text.primary',
+                }}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 40, color: 'text.primary' }}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.name} />
               </ListItemButton>
             </ListItem>
@@ -163,7 +147,7 @@ export default function PersonUserHome() {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, ml: 30, position: "relative" }}
+        sx={{ flexGrow: 1, ml: 30, position: "relative", bgcolor: 'background.default' }}
       >
         <img
           src="/sphere_wire_frame.svg"
@@ -175,24 +159,26 @@ export default function PersonUserHome() {
             height: "100vh",
             objectFit: "cover",
             zIndex: -1,
-            opacity: 0.2,
+            opacity: 0.1,
+            filter: isDarkMode ? 'invert(1)' : 'none',
           }}
         />
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <Typography variant="h4" gutterBottom>
-              Person User Dashboard
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Manage your personal information and related data
-            </Typography>
-          </Box>
-          {services.map((section) => (
-            <Box key={section.title}>
-              {renderServiceGrid(section.items)}
-              <hr style={{ margin: "20px 0" }} />
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 2, bgcolor: 'background.paper' }}>
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Typography variant="h4" sx={{ color: 'text.primary' }} gutterBottom>
+                Person User Dashboard
+              </Typography>
+              <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
+                Manage your personal information and related data
+              </Typography>
             </Box>
-          ))}
+            {services.map((section) => (
+              <Box key={section.title}>
+                {renderServiceGrid(section.items)}
+              </Box>
+            ))}
+          </Paper>
         </Container>
       </Box>
     </Box>

@@ -25,7 +25,7 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // State to track dark mode status
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   // Memoize theme object to prevent unnecessary recalculations
   const theme = useMemo(() => 
     isDarkMode ? darkTheme : lightTheme,  // Choose theme based on mode
@@ -47,3 +47,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     </ThemeContext.Provider>
   );
 };
+
+// จดเฉยๆ ไม่มีอะไร 
+// สีเว็บ รร
+// #f5eb14 

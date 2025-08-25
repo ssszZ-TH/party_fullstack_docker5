@@ -1,186 +1,205 @@
-// styles/theme.ts
 import { createTheme } from '@mui/material/styles';
 
 export const lightTheme = createTheme({
   palette: {
     primary: {
-      main: '#86B5EA', // สีปุ่มหลัก (Update, Add)
-      light: '#A8C9F0', // สีอ่อนกว่า
-      dark: '#5E9AE5', // สีเข้มกว่า
-      contrastText: '#273D54', // สีตัวหนังสือ
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#388E3C',
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#FFB3BA', // สีปุ่มแดง
-      contrastText: '#273D54', // สีตัวหนังสือ (เหมือนเดิม)
+      main: '#FFFFFF',
+      contrastText: '#212121',
     },
     error: {
-      main: '#FFB3BA', // ใช้สีแดงเดียวกันสำหรับ error state
+      main: '#EF5350',
     },
     background: {
-      default: '#E7F1FC', // สีฉากหลัง
-      paper: '#FFFFFF', // สีพื้นของ Card, Modal
+      default: '#F5F5F5',
+      paper: '#FFFFFF',
     },
     text: {
-      primary: '#273D54', // สีตัวหนังสือหลัก
-      secondary: '#5A6A85', // สีตัวหนังสือรอง (โทนเดียวกันแต่อ่อนกว่า)
+      primary: '#212121',
+      secondary: '#616161',
     },
   },
   typography: {
-    fontFamily: [
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif'
-    ].join(','),
+    fontFamily: ['"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
     h6: {
-      fontWeight: 600, // ตัวหนาสำหรับหัวข้อ
-      color: '#273D54'
+      fontWeight: 600,
+      color: '#212121',
     },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#E7F1FC',
-          color: '#273D54',
+          backgroundColor: '#F5F5F5',
+          color: '#212121',
         },
       },
     },
-    // ปรับแต่ง AppBar (Navbar)
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#86B5EA', // ใช้สีเดียวกับปุ่มหลัก
-          color: '#273D54',
-          boxShadow: 'none', // เอาตกแต่งเงาออก
+          backgroundColor: '#4CAF50',
+          color: '#FFFFFF',
+          boxShadow: 'none',
         },
       },
     },
-    // ปรับแต่งปุ่ม
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none', // ปิดการแปลงเป็นตัวใหญ่ทั้งหมด
+          textTransform: 'none',
           fontWeight: 600,
           borderRadius: '8px',
           padding: '8px 16px',
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#5E9AE5', // สีเข้มกว่าเมื่อโฮเวอร์
+            backgroundColor: '#388E3C',
           },
         },
         containedSecondary: {
           '&:hover': {
-            backgroundColor: '#FF9BA3', // สีแดงเข้มกว่าเมื่อโฮเวอร์
+            backgroundColor: '#E0E0E0',
           },
         },
       },
     },
-    // ปรับแต่งการ์ด
     MuiCard: {
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)', // เงาแบบนุ่ม
+          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          border: 'none', // ลบกรอบรอบ Avatar
         },
       },
     },
   },
   shape: {
-    borderRadius: 8, // ความโค้งมุมพื้นฐาน
+    borderRadius: 8,
   },
 });
 
 export const darkTheme = createTheme({
   palette: {
     primary: {
-      main: '#86B5EA', // สีปุ่มหลัก (Update, Add)
-      light: '#A8C9F0', // สีอ่อนกว่า
-      dark: '#5E9AE5', // สีเข้มกว่า
-      contrastText: '#273D54', // สีตัวหนังสือ
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#388E3C',
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#FFB3BA', // สีปุ่มแดง
-      contrastText: '#273D54', // สีตัวหนังสือ (เหมือนเดิม)
+      main: '#212121',
+      contrastText: '#FFFFFF',
     },
     error: {
-      main: '#FFB3BA', // ใช้สีแดงเดียวกันสำหรับ error state
+      main: '#EF5350',
     },
     background: {
-      default: '#E7F1FC', // สีฉากหลัง
-      paper: '#FFFFFF', // สีพื้นของ Card, Modal
+      default: '#121212',
+      paper: '#1E1E1E',
     },
     text: {
-      primary: '#273D54', // สีตัวหนังสือหลัก
-      secondary: '#5A6A85', // สีตัวหนังสือรอง (โทนเดียวกันแต่อ่อนกว่า)
+      primary: '#E0E0E0',
+      secondary: '#B0B0B0',
     },
   },
   typography: {
-    fontFamily: [
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif'
-    ].join(','),
+    fontFamily: ['"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
     h6: {
-      fontWeight: 600, // ตัวหนาสำหรับหัวข้อ
-      color: '#273D54'
+      fontWeight: 600,
+      color: '#E0E0E0',
     },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#E7F1FC',
-          color: '#273D54',
+          backgroundColor: '#121212',
+          color: '#E0E0E0',
         },
       },
     },
-    // ปรับแต่ง AppBar (Navbar)
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#86B5EA', // ใช้สีเดียวกับปุ่มหลัก
-          color: '#273D54',
-          boxShadow: 'none', // เอาตกแต่งเงาออก
+          backgroundColor: '#388E3C',
+          color: '#FFFFFF',
+          boxShadow: 'none',
         },
       },
     },
-    // ปรับแต่งปุ่ม
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none', // ปิดการแปลงเป็นตัวใหญ่ทั้งหมด
+          textTransform: 'none',
           fontWeight: 600,
           borderRadius: '8px',
           padding: '8px 16px',
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#5E9AE5', // สีเข้มกว่าเมื่อโฮเวอร์
+            backgroundColor: '#2E7D32',
           },
         },
         containedSecondary: {
           '&:hover': {
-            backgroundColor: '#FF9BA3', // สีแดงเข้มกว่าเมื่อโฮเวอร์
+            backgroundColor: '#424242',
           },
         },
       },
     },
-    // ปรับแต่งการ์ด
     MuiCard: {
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)', // เงาแบบนุ่ม
+          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.3)',
+          backgroundColor: '#1E1E1E',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputBase-input': {
+            color: '#E0E0E0',
+          },
+          '& .MuiInputLabel-root': {
+            color: '#B0B0B0',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: '#B0B0B0',
+            },
+            '&:hover fieldset': {
+              borderColor: '#E0E0E0',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#4CAF50',
+            },
+          },
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          border: 'none', // ลบกรอบรอบ Avatar
         },
       },
     },
   },
   shape: {
-    borderRadius: 8, // ความโค้งมุมพื้นฐาน
+    borderRadius: 8,
   },
 });
