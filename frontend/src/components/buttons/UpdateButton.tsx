@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import Tooltip from "@mui/material/Tooltip";
 
 interface UpdateButtonProps {
@@ -13,7 +13,7 @@ const UpdateButton: React.FC<UpdateButtonProps> = ({
   onClick,
   disabled = false,
 }) => {
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tooltip title="Edit" placement="top">
@@ -22,13 +22,14 @@ const UpdateButton: React.FC<UpdateButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
           "&:hover": {
-            backgroundColor: theme.palette.primary.dark,
+            backgroundColor: 'primary.dark',
           },
           margin: "4px",
           textTransform: "none",
+          borderRadius: 'shape.borderRadius',
         }}
       >
         <EditIcon />

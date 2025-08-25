@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import PassportIcon from "@mui/icons-material/CardTravel";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import Tooltip from "@mui/material/Tooltip";
 
 interface PassportButtonProps {
@@ -13,7 +13,7 @@ const PassportButton: React.FC<PassportButtonProps> = ({
   onClick,
   disabled = false,
 }) => {
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tooltip title="Manage passports for this citizenship" placement="top">
@@ -22,16 +22,17 @@ const PassportButton: React.FC<PassportButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
           "&:hover": {
-            backgroundColor: theme.palette.primary.dark,
+            backgroundColor: 'primary.dark',
           },
           margin: "4px",
           textTransform: "none",
           display: "flex",
           alignItems: "center",
           gap: 1,
+          borderRadius: 'shape.borderRadius',
         }}
       >
         <PassportIcon />

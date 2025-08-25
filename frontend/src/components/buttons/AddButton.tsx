@@ -1,27 +1,21 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add"; // Icon บวก
-import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
+import { useTheme } from "../../contexts/ThemeContext";
 import { Tooltip } from "@mui/material";
 
 interface AddButtonProps {
   onClick: () => void;
   disabled?: boolean;
-  label?: string; // เพิ่ม prop สำหรับเปลี่ยนข้อความได้
+  label?: string;
 }
 
-/**
- * Reusable Add Button Component
- * - Uses theme's primary color
- * - Displays plus icon
- * - Accepts custom label
- */
 const AddButton: React.FC<AddButtonProps> = ({
   onClick,
   disabled = false,
-  label = "Add", // ค่า default
+  label = "Add",
 }) => {
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tooltip title={label} placement="top">
@@ -30,13 +24,14 @@ const AddButton: React.FC<AddButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
           "&:hover": {
-            backgroundColor: theme.palette.primary.dark,
+            backgroundColor: 'primary.dark',
           },
           margin: "4px",
-          textTransform: "none", // ป้องกันตัวอักษรใหญ่ทั้งหมด
+          textTransform: "none",
+          borderRadius: 'shape.borderRadius',
         }}
       >
         <AddIcon />

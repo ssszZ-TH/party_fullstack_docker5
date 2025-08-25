@@ -5,56 +5,45 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import MenuItem from "@mui/material/MenuItem";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"; // Changed from AdbIcon to ArrowBack
-import { styled, useTheme } from "@mui/material/styles";
+// import MenuItem from "@mui/material/MenuItem";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { styled } from "@mui/material/styles";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface ResponsiveAppBarProps {
   title: string;
 }
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+// const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: theme.palette.primary.main,
   boxShadow: theme.shadows[4],
+  color: theme.palette.primary.contrastText,
 }));
 
-const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
-  "&:hover": {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
-    transition: "background-color 0.2s ease-in-out",
-  },
-}));
 
 function ResponsiveAppBar({ title }: ResponsiveAppBarProps) {
-  const theme = useTheme();
-
+  const { isDarkMode } = useTheme();
   const [titleText] = React.useState<string>(title || "...");
 
   const handleGoHome = () => {
     window.location.href = "/";
   };
 
-
-
-
-
   return (
     <StyledAppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* Back Arrow Icon (Left-most element) */}
           <IconButton
-            edge="start" // This makes it stick to the left
+            edge="start"
             color="inherit"
             aria-label="go back"
             onClick={handleGoHome}
             sx={{ 
               mr: 1,
               "&:hover": { 
-                backgroundColor: theme.palette.action.hover,
+                backgroundColor: 'action.hover',
                 transform: "scale(1.1)",
                 transition: "all 0.2s ease-in-out"
               }
@@ -63,7 +52,6 @@ function ResponsiveAppBar({ title }: ResponsiveAppBarProps) {
             <ArrowBackIcon />
           </IconButton>
 
-          {/* Title (Center) */}
           <Typography
             variant="h6"
             noWrap
@@ -71,18 +59,17 @@ function ResponsiveAppBar({ title }: ResponsiveAppBarProps) {
             sx={{
               flexGrow: 1,
               display: { xs: "none", md: "flex" },
-              fontFamily: theme.typography.fontFamily,
-              fontWeight: 700,
+              fontFamily: 'fontFamily',
+              fontWeight: 600,
               letterSpacing: ".1rem",
-              color: "inherit",
-              justifyContent: "center", // Center the title
-              ml: -5 // Adjust to compensate for arrow button
+              color: 'text.primary',
+              justifyContent: "center",
+              ml: -5
             }}
           >
             {titleText}
           </Typography>
 
-          {/* Mobile Title */}
           <Typography
             variant="h5"
             noWrap
@@ -90,17 +77,16 @@ function ResponsiveAppBar({ title }: ResponsiveAppBarProps) {
             sx={{
               flexGrow: 1,
               display: { xs: "flex", md: "none" },
-              fontFamily: theme.typography.fontFamily,
-              fontWeight: 700,
+              fontFamily: 'fontFamily',
+              fontWeight: 600,
               letterSpacing: ".1rem",
-              color: "inherit",
+              color: 'text.primary',
               justifyContent: "center"
             }}
           >
             {titleText}
           </Typography>
 
-          {/* User Menu (Right) */}
           <Box sx={{ flexGrow: 0 }}>
           </Box>
         </Toolbar>

@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import Tooltip from "@mui/material/Tooltip";
 
 interface CancelButtonProps {
@@ -13,7 +13,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({
   onClick,
   disabled = false,
 }) => {
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tooltip title="Cancel" placement="top">
@@ -22,13 +22,14 @@ const CancelButton: React.FC<CancelButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         sx={{
-          backgroundColor: theme.palette.error.main,
-          color: theme.palette.error.contrastText,
+          backgroundColor: 'error.main',
+          color: 'error.contrastText',
           "&:hover": {
-            backgroundColor: theme.palette.error.dark,
+            backgroundColor: 'error.dark',
           },
           margin: "4px",
           textTransform: "none",
+          borderRadius: 'shape.borderRadius',
         }}
       >
         <CloseIcon />

@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface DataTableProps {
   columns: GridColDef[];
@@ -11,15 +11,15 @@ interface DataTableProps {
 const paginationModel = { page: 0, pageSize: 10 };
 
 export default function DataTable({ columns, rows, getRowId }: DataTableProps) {
-  const theme = useTheme(); // เรียกใช้ theme จาก context
+  const { isDarkMode } = useTheme();
 
   return (
     <Paper 
       sx={{ 
         height: "82vh", 
         width: "100%",
-        backgroundColor: theme.palette.background.default, // ใช้สีจาก theme
-        boxShadow: theme.shadows[3], // ใช้ shadow จาก theme
+        backgroundColor: 'background.paper',
+        boxShadow: 'shadows.3',
       }}
     >
       <DataGrid
@@ -31,18 +31,19 @@ export default function DataTable({ columns, rows, getRowId }: DataTableProps) {
         sx={{
           border: 0,
           '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: theme.palette.primary.main, // สีหัวคอลัมน์
-            color: theme.palette.primary.contrastText, // สีข้อความหัวคอลัมน์
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
             fontSize: '0.875rem',
           },
           '& .MuiDataGrid-cell': {
-            borderBottom: `1px solid ${theme.palette.divider}`, // เส้นแบ่งแถว
+            borderBottom: `1px solid divider`,
+            color: 'text.primary',
           },
           '& .MuiDataGrid-row:hover': {
-            backgroundColor: theme.palette.action.hover, // สีเมื่อ hover
+            backgroundColor: 'action.hover',
           },
           '& .MuiTablePagination-root': {
-            color: theme.palette.text.primary, // สีตัวเลข pagination
+            color: 'text.primary',
           },
         }}
       />

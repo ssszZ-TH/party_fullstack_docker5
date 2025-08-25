@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Box, TextField, Typography, Stack } from "@mui/material"; // เพิ่ม Stack
+import { Modal, Box, TextField, Typography, Stack } from "@mui/material";
 import SaveButton from "../buttons/SaveButton";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface typeOfFormData {
   id: number | null;
@@ -13,9 +14,10 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
+  bgcolor: 'background.paper',
+  boxShadow: 'shadows.4',
   p: 4,
+  borderRadius: 'shape.borderRadius',
 };
 
 interface typeofModalProps {
@@ -33,6 +35,7 @@ export default function MaritalStatusTypeModal({
   onSubmit,
   openModalFor,
 }: typeofModalProps) {
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState<typeOfFormData>({
     id: null,
     description: "",
@@ -62,7 +65,7 @@ export default function MaritalStatusTypeModal({
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={style}>
-        <Typography variant="h6" component="h2">
+        <Typography variant="h6" sx={{ color: 'text.primary', mb: 2 }}>
           Details
         </Typography>
         <TextField
@@ -72,9 +75,16 @@ export default function MaritalStatusTypeModal({
           onChange={handleChange}
           fullWidth
           margin="normal"
+          variant="outlined"
+          InputLabelProps={{ style: { color: 'text.secondary' } }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main',
+              },
+            },
+          }}
         />
-
-        {/* ใช้ Stack เพื่อจัดตำแหน่งปุ่ม */}
         <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2 }}>
           <SaveButton onClick={handleSubmit} />
         </Stack>

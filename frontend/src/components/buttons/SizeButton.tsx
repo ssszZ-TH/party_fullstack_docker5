@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import GroupIcon from "@mui/icons-material/Group";
-import { useTheme } from "@mui/material/styles";
+import { useTheme } from "../../contexts/ThemeContext";
 import Tooltip from "@mui/material/Tooltip";
 
 interface SizeButtonProps {
@@ -13,7 +13,7 @@ const SizeButton: React.FC<SizeButtonProps> = ({
   onClick,
   disabled = false,
 }) => {
-  const theme = useTheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tooltip title="Manage Size for this organization" placement="top">
@@ -22,16 +22,17 @@ const SizeButton: React.FC<SizeButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
           "&:hover": {
-            backgroundColor: theme.palette.primary.dark,
+            backgroundColor: 'primary.dark',
           },
           margin: "4px",
           textTransform: "none",
           display: "flex",
           alignItems: "center",
           gap: 1,
+          borderRadius: 'shape.borderRadius',
         }}
       >
         <GroupIcon />
