@@ -1,49 +1,59 @@
 import { createTheme } from '@mui/material/styles';
 
+// Discord-inspired color scheme
 export const lightTheme = createTheme({
   palette: {
     primary: {
-      main: '#4CAF50',
-      light: '#81C784',
-      dark: '#388E3C',
+      main: '#5865F2', // Discord blurple
+      light: '#7289DA',
+      dark: '#4752C4',
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#FFFFFF',
-      contrastText: '#212121',
+      main: '#99AAB5', // Discord grey
+      contrastText: '#2C2F33',
     },
     error: {
-      main: '#EF5350',
+      main: '#ED4245', // Discord red
     },
     background: {
-      default: '#F5F5F5',
+      default: '#F2F3F5', // Discord light background
       paper: '#FFFFFF',
     },
     text: {
-      primary: '#212121',
-      secondary: '#616161',
+      primary: '#2C2F33', // Dark text
+      secondary: '#4F5660',
+    },
+    action: {
+      hover: '#DCDEE1', // Subtle hover background
     },
   },
   typography: {
-    fontFamily: ['"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
+    fontFamily: ['"Tahoma"', '"Verdana"', '"Segoe UI"', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
     h6: {
       fontWeight: 600,
-      color: '#212121',
+      color: '#2C2F33',
+    },
+    body1: {
+      fontSize: '0.875rem',
+    },
+    body2: {
+      fontSize: '0.75rem',
     },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#F5F5F5',
-          color: '#212121',
+          backgroundColor: '#F2F3F5',
+          color: '#2C2F33',
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#4CAF50',
+          backgroundColor: '#5865F2',
           color: '#FFFFFF',
           boxShadow: 'none',
         },
@@ -54,17 +64,17 @@ export const lightTheme = createTheme({
         root: {
           textTransform: 'none',
           fontWeight: 600,
-          borderRadius: '8px',
+          borderRadius: '4px',
           padding: '8px 16px',
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#388E3C',
+            backgroundColor: '#4752C4',
           },
         },
         containedSecondary: {
           '&:hover': {
-            backgroundColor: '#E0E0E0',
+            backgroundColor: '#8B9AA3',
           },
         },
       },
@@ -72,99 +82,9 @@ export const lightTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: '12px',
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
-        },
-      },
-    },
-    MuiAvatar: {
-      styleOverrides: {
-        root: {
-          border: 'none', // ลบกรอบรอบ Avatar
-        },
-      },
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-});
-
-export const darkTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#4CAF50',
-      light: '#81C784',
-      dark: '#388E3C',
-      contrastText: '#FFFFFF',
-    },
-    secondary: {
-      main: '#212121',
-      contrastText: '#FFFFFF',
-    },
-    error: {
-      main: '#EF5350',
-    },
-    background: {
-      default: '#121212',
-      paper: '#1E1E1E',
-    },
-    text: {
-      primary: '#E0E0E0',
-      secondary: '#B0B0B0',
-    },
-  },
-  typography: {
-    fontFamily: ['"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
-    h6: {
-      fontWeight: 600,
-      color: '#E0E0E0',
-    },
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundColor: '#121212',
-          color: '#E0E0E0',
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#388E3C',
-          color: '#FFFFFF',
-          boxShadow: 'none',
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 600,
-          borderRadius: '8px',
-          padding: '8px 16px',
-        },
-        containedPrimary: {
-          '&:hover': {
-            backgroundColor: '#2E7D32',
-          },
-        },
-        containedSecondary: {
-          '&:hover': {
-            backgroundColor: '#424242',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: '12px',
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.3)',
-          backgroundColor: '#1E1E1E',
+          borderRadius: '4px',
+          boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)',
+          backgroundColor: '#FFFFFF',
         },
       },
     },
@@ -172,20 +92,20 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiInputBase-input': {
-            color: '#E0E0E0',
+            color: '#2C2F33',
           },
           '& .MuiInputLabel-root': {
-            color: '#B0B0B0',
+            color: '#4F5660',
           },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: '#B0B0B0',
+              borderColor: '#DCDEE1',
             },
             '&:hover fieldset': {
-              borderColor: '#E0E0E0',
+              borderColor: '#5865F2',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#4CAF50',
+              borderColor: '#5865F2',
             },
           },
         },
@@ -194,12 +114,153 @@ export const darkTheme = createTheme({
     MuiAvatar: {
       styleOverrides: {
         root: {
-          border: 'none', // ลบกรอบรอบ Avatar
+          border: 'none',
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: '#DCDEE1',
+          },
         },
       },
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 4,
+  },
+});
+
+export const darkTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#5865F2', // Discord blurple
+      light: '#7289DA',
+      dark: '#4752C4',
+      contrastText: '#FFFFFF',
+    },
+    secondary: {
+      main: '#4F5660', // Discord dark grey
+      contrastText: '#FFFFFF',
+    },
+    error: {
+      main: '#ED4245', // Discord red
+    },
+    background: {
+      default: '#2C2F33', // Discord dark background
+      paper: '#36393F',
+    },
+    text: {
+      primary: '#DCDDDE', // Light text
+      secondary: '#B0B2B5',
+    },
+    action: {
+      hover: '#40444B', // Subtle hover background
+    },
+  },
+  typography: {
+    fontFamily: ['"Tahoma"', '"Verdana"', '"Segoe UI"', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
+    h6: {
+      fontWeight: 600,
+      color: '#DCDDDE',
+    },
+    body1: {
+      fontSize: '0.875rem',
+    },
+    body2: {
+      fontSize: '0.75rem',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: '#2C2F33',
+          color: '#DCDDDE',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#36393F',
+          color: '#DCDDDE',
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          borderRadius: '4px',
+          padding: '8px 16px',
+        },
+        containedPrimary: {
+          '&:hover': {
+            backgroundColor: '#4752C4',
+          },
+        },
+        containedSecondary: {
+          '&:hover': {
+            backgroundColor: '#5C6269',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: '4px',
+          boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.4)',
+          backgroundColor: '#36393F',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputBase-input': {
+            color: '#DCDDDE',
+          },
+          '& .MuiInputLabel-root': {
+            color: '#B0B2B5',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: '#4F5660',
+            },
+            '&:hover fieldset': {
+              borderColor: '#5865F2',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#5865F2',
+            },
+          },
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          border: 'none',
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: '#40444B',
+          },
+        },
+      },
+    },
+  },
+  shape: {
+    borderRadius: 4,
   },
 });

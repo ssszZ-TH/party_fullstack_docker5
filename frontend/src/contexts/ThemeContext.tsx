@@ -15,7 +15,7 @@ type ThemeContextType = {
 // Create context with default values
 const ThemeContext = createContext<ThemeContextType>({
   toggleTheme: () => {},      // Empty default toggle function
-  isDarkMode: false,          // Default to light theme
+  isDarkMode: true,          // Default to dark theme
 });
 
 // Custom hook to easily access theme context
@@ -24,7 +24,7 @@ export const useTheme = () => useContext(ThemeContext);
 // Theme provider component (wrap around your app)
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // State to track dark mode status
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Memoize theme object to prevent unnecessary recalculations
   const theme = useMemo(() => 
