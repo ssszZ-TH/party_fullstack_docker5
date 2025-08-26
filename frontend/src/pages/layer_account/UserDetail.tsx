@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Paper, Stack, TextField, MenuItem } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { getUserById, updateUser, createUser } from '../../services/users';
+import { getUserById, updateUser, createUser, deleteUser } from '../../services/users';
 import { useTheme } from '../../contexts/ThemeContext';
 import AppBarCustom from '../../components/AppBarCustom';
 import SaveButton from '../../components/buttons/SaveButton';
 import CancelButton from '../../components/buttons/CancelButton';
 import Loading from '../../components/Loading';
+import DeleteButton from '../../components/buttons/DeleteButton';
 
 interface User {
   id?: number;
@@ -123,6 +124,17 @@ export default function UserDetail() {
 
   const handleCancel = () => {
     navigate('/users');
+  };
+
+  const handleDelete = async () => {
+    if (!param || isNaN(Number(param))) return;
+    try {
+      await deleteUser(parseInt(param));
+      navigate('/users');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setError('Failed to delete user');
+    }
   };
 
   if (loading) {
@@ -254,9 +266,16 @@ export default function UserDetail() {
               </Typography>
             )}
           </Box>
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Stack direction="row" spacing={2} justifyContent="space-between">
             <CancelButton onClick={handleCancel} />
-            <SaveButton onClick={handleSubmit} />
+            <Box>
+              {!isCreateMode && (
+                <DeleteButton 
+                  onClick={handleDelete} 
+                />
+              )}
+              <SaveButton onClick={handleSubmit}  />
+            </Box>
           </Stack>
         </Paper>
       </Container>

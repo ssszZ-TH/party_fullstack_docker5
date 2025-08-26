@@ -98,12 +98,12 @@ export default function Users() {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       <AppBarCustom title="Users" />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+      <Container maxWidth="lg" sx={{ flexGrow: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h4" sx={{ color: 'text.primary' }}>
             All Users
           </Typography>
-          <AddButton onClick={() => navigate('/user/create')} />
+          <AddButton onClick={() => navigate('/users/create')} />
         </Box>
         {loading ? (
           <Loading />
