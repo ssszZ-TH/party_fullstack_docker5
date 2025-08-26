@@ -28,9 +28,10 @@ const services = [
   {
     title: "Admin Management",
     items: [
-      { name: "Manage Organization Admins", path: "/v1/organization_admins" },
-      { name: "Manage HR Admins", path: "/v1/hr_admins" },
-      { name: "Manage Basetype Admins", path: "/v1/basetype_admins" },
+      { name: "Manage User", path: "/users" },
+      { name: "User History", path: "/users-history" },
+      { name: "Person History", path: "/persons-history" },
+      { name: "Organization History", path: "/organizations-history" },
     ],
   },
 ];

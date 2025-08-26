@@ -29,6 +29,11 @@ const protectedroutes: ProtectedRoute[] = [
   { path: '/profiles/organization-user', component: lazy(() => import('./pages/profiles/OrganizationUserProfile')) },
   { path: '/profiles/basetype-admin', component: lazy(() => import('./pages/profiles/BasetypeAdminProfile')) },
   { path: '/profiles/system-admin', component: lazy(() => import('./pages/profiles/SystemAdminProfile')) },
+  { path: '/users', component: lazy(() => import('./pages/layer_account/Users')) },
+  { path: '/user/:id', component: lazy(() => import('./pages/layer_account/UserDetail')) },
+  { path: '/users-history', component: lazy(() => import('./pages/layer_account/UserHistory')) },
+  { path: '/persons-history', component: lazy(() => import('./pages/layer_history/PersonHistory')) },
+  { path: '/organizations-history', component: lazy(() => import('./pages/layer_history/OrganizationHistory')) },
 ];
 
 const unprotectedroutes: UnprotectedRoute[] = [
