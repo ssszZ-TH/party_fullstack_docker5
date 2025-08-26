@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Container, Typography, Paper, Stack, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -33,7 +33,7 @@ interface UserProfile {
 
 export default function PersonUserProfile() {
   const { isDarkMode } = useTheme();
-  const { setIsAuthenticated } = React.useContext(AuthContext);
+  const { setIsAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +43,7 @@ export default function PersonUserProfile() {
       try {
         const token = Cookies.get("access_token");
         if (!token) {
+          logout();
           navigate("/login");
           return;
         }
@@ -50,22 +51,21 @@ export default function PersonUserProfile() {
         setProfile(data);
       } catch (error) {
         console.error("Error fetching profile:", error);
+        logout();
         navigate("/login");
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, logout]);
 
   const handleHome = () => {
     navigate("/homes/person-user");
   };
 
   const handleLogout = () => {
-    Cookies.remove("access_token");
-    Cookies.remove("role");
-    setIsAuthenticated(false);
+    logout();
     navigate("/login");
   };
 
@@ -76,7 +76,6 @@ export default function PersonUserProfile() {
   if (!profile) {
     return <div>No profile data available</div>;
   }
-
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Container, Typography, Paper, Stack, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -19,7 +19,7 @@ interface UserProfile {
 
 export default function HrAdminProfile() {
   const { isDarkMode } = useTheme();
-  const { setIsAuthenticated } = React.useContext(AuthContext);
+  const { setIsAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,7 @@ export default function HrAdminProfile() {
       try {
         const token = Cookies.get("access_token");
         if (!token) {
+          logout();
           navigate("/login");
           return;
         }
@@ -36,22 +37,21 @@ export default function HrAdminProfile() {
         setProfile(data);
       } catch (error) {
         console.error("Error fetching profile:", error);
+        logout();
         navigate("/login");
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, logout]);
 
   const handleHome = () => {
     navigate("/homes/hr-admin");
   };
 
   const handleLogout = () => {
-    Cookies.remove("access_token");
-    Cookies.remove("role");
-    setIsAuthenticated(false);
+    logout();
     navigate("/login");
   };
 
