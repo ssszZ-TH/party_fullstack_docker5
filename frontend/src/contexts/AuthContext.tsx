@@ -7,6 +7,7 @@ interface AuthContextType {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   role: string | null;
   setRole: React.Dispatch<React.SetStateAction<string | null>>;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -14,12 +15,20 @@ export const AuthContext = createContext<AuthContextType>({
   setIsAuthenticated: () => {},
   role: null,
   setRole: () => {},
+  logout: () => {},
 });
 
 // AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [role, setRole] = useState<string | null>(null);
+
+  const logout = () => {
+    Cookies.remove('access_token');
+    Cookies.remove('role');
+    setIsAuthenticated(false);
+    setRole(null);
+  };
 
   useEffect(() => {
     const token = Cookies.get('access_token');
@@ -30,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated,  setIsAuthenticated, role, setRole }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, role, setRole, logout }}>
       {children}
     </AuthContext.Provider>
   );

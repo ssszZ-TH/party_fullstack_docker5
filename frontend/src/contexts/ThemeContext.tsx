@@ -15,7 +15,7 @@ type ThemeContextType = {
 // Create context with default values
 const ThemeContext = createContext<ThemeContextType>({
   toggleTheme: () => {},      // Empty default toggle function
-  isDarkMode: true,          // Default to dark theme
+  isDarkMode: true,          // Default theme
 });
 
 // Custom hook to easily access theme context
