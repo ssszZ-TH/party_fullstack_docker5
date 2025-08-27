@@ -82,7 +82,6 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
     async with database.transaction():
         try:
             user = UserCreate(username=organization.username, email=organization.email, password=organization.password, role="organization_user")
-            # create_user จะ hash password เอง เราไม่ต้องไปทำให้มัน
             user_result = await create_user(user, action_by)
             if not user_result:
                 logger.warning(f"Failed to create user for organization: {organization.email}")
@@ -127,7 +126,6 @@ async def create_organization(organization: OrganizationCreate, action_by: Optio
                     action="create",
                     action_by=action_by
                 )
-                # ไม่ต้องไป log user history เพราะตอน create_user มัน log ให้แล้ว
                 logger.info(f"Created organization: id={user_result.id}")
                 return OrganizationOut(
                     username=user_result.username,
@@ -145,10 +143,10 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         values = {"id": organization_id, "updated_at": datetime.utcnow()}
         query_parts = []
 
-        if organization.federal_tax_id is not None:
+        if organization.federal_tax_id is not None and organization.federal_tax_id != '':
             query_parts.append("federal_tax_id = :federal_tax_id")
             values["federal_tax_id"] = organization.federal_tax_id
-        if organization.name_en is not None:
+        if organization.name_en is not None and organization.name_en != '':
             query_parts.append("name_en = :name_en")
             values["name_en"] = organization.name_en
         if organization.name_th is not None:
@@ -170,35 +168,32 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         # Update user table if username, email, or password is provided
         user_values = {"id": organization_id}
         user_query_parts = []
-        if organization.username is not None:
+        if organization.username is not None and organization.username != '':
             user_query_parts.append("username = :username")
             user_values["username"] = organization.username
-        if organization.email is not None:
+        if organization.email is not None and organization.email != '':
             user_query_parts.append("email = :email")
             user_values["email"] = organization.email
-        if organization.password is not None:
+        if organization.password is not None and organization.password != '':
             user_query_parts.append("password = :password")
-            # password ไม่ต้อง hash ตอน update_user เดี๋ยวมัน hash ให้เราเอง
             user_values["password"] = organization.password
 
         old_data = await get_organization(organization_id)
-        # update ตัวที่ไม่มีอยู่จริง ให้ return none ไปเลย
         if not old_data:
             return None
 
         user_result = None
         if user_query_parts:
             user_update = UserUpdate(
-                username=organization.username,
-                email=organization.email,
-                password=organization.password,
+                username=organization.username if organization.username and organization.username != '' else None,
+                email=organization.email if organization.email and organization.email != '' else None,
+                password=organization.password if organization.password and organization.password != '' else None,
                 role=None
             )
-            user_result = await update_user(user_update, action_by)
+            user_result = await update_user(organization_id, user_update, action_by)
             if not user_result:
                 logger.warning(f"Failed to update user for organization: id={organization_id}")
                 return None
-            # ไม่ต้อง log user history เพราะ update_user จะทำการ log history ให้เอง
 
         if not query_parts and not user_query_parts:
             logger.info(f"No fields to update for organization id={organization_id}")
@@ -219,8 +214,8 @@ async def update_organization(organization_id: int, organization: OrganizationUp
         if result:
             await log_organization_history(
                 organization_id=organization_id,
-                federal_tax_id=organization.federal_tax_id if organization.federal_tax_id is not None else old_data.federal_tax_id,
-                name_en=organization.name_en if organization.name_en is not None else old_data.name_en,
+                federal_tax_id=organization.federal_tax_id if organization.federal_tax_id is not None and organization.federal_tax_id != '' else old_data.federal_tax_id,
+                name_en=organization.name_en if organization.name_en and organization.name_en != '' else old_data.name_en,
                 name_th=organization.name_th if organization.name_th is not None else old_data.name_th,
                 organization_type_id=organization.organization_type_id if organization.organization_type_id is not None else old_data.organization_type_id,
                 industry_type_id=organization.industry_type_id if organization.industry_type_id is not None else old_data.industry_type_id,

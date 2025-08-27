@@ -19,10 +19,18 @@ interface Person {
   email: string;
   personal_id_number: string;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
+  nick_name: string | null;
   birth_date: string;
+  gender_type_id: number | null;
+  marital_status_type_id: number | null;
+  country_id: number | null;
   height: number;
   weight: number;
+  racial_type_id: number | null;
+  income_range_id: number | null;
+  about_me: string | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -86,15 +94,23 @@ export default function Persons() {
     { field: 'email', headerName: 'Email', width: 200 },
     { field: 'personal_id_number', headerName: 'Personal ID', width: 150 },
     { field: 'first_name', headerName: 'First Name', width: 150 },
+    { field: 'middle_name', headerName: 'Middle Name', width: 150, valueFormatter: (value: string | null) => value || 'N/A' },
     { field: 'last_name', headerName: 'Last Name', width: 150 },
+    { field: 'nick_name', headerName: 'Nick Name', width: 150, valueFormatter: (value: string | null) => value || 'N/A' },
     {
       field: 'birth_date',
       headerName: 'Birth Date',
       width: 150,
       valueFormatter: (value: string | null) => value ? new Date(value).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' }) : 'N/A',
     },
+    { field: 'gender_type_id', headerName: 'Gender Type ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
+    { field: 'marital_status_type_id', headerName: 'Marital Status ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
+    { field: 'country_id', headerName: 'Country ID', width: 100, valueFormatter: (value: number | null) => value ?? 'N/A' },
     { field: 'height', headerName: 'Height (cm)', width: 100 },
     { field: 'weight', headerName: 'Weight (kg)', width: 100 },
+    { field: 'racial_type_id', headerName: 'Racial Type ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
+    { field: 'income_range_id', headerName: 'Income Range ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
+    { field: 'about_me', headerName: 'About Me', width: 200, valueFormatter: (value: string | null) => value || 'N/A' },
     {
       field: 'created_at',
       headerName: 'Created At',

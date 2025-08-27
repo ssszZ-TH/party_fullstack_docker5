@@ -18,14 +18,14 @@ interface Person {
   personal_id_number: string;
   first_name: string;
   last_name: string;
-  birth_date: string;
-  height: number;
-  weight: number;
   middle_name?: string | null;
   nick_name?: string | null;
+  birth_date: string;
   gender_type_id?: number | null;
   marital_status_type_id?: number | null;
   country_id?: number | null;
+  height: number;
+  weight: number;
   racial_type_id?: number | null;
   income_range_id?: number | null;
   about_me?: string | null;
@@ -56,9 +56,17 @@ export default function PersonDetail() {
     personal_id_number: '',
     first_name: '',
     last_name: '',
+    middle_name: '',
+    nick_name: '',
     birth_date: '',
+    gender_type_id: '',
+    marital_status_type_id: '',
+    country_id: '',
     height: '',
     weight: '',
+    racial_type_id: '',
+    income_range_id: '',
+    about_me: '',
   });
   const [loading, setLoading] = useState(!isCreateMode);
   const [error, setError] = useState<string | null>(null);
@@ -88,9 +96,17 @@ export default function PersonDetail() {
               personal_id_number: data.personal_id_number || '',
               first_name: data.first_name || '',
               last_name: data.last_name || '',
+              middle_name: data.middle_name || '',
+              nick_name: data.nick_name || '',
               birth_date: data.birth_date || '',
+              gender_type_id: data.gender_type_id ? data.gender_type_id.toString() : '',
+              marital_status_type_id: data.marital_status_type_id ? data.marital_status_type_id.toString() : '',
+              country_id: data.country_id ? data.country_id.toString() : '',
               height: data.height ? data.height.toString() : '',
               weight: data.weight ? data.weight.toString() : '',
+              racial_type_id: data.racial_type_id ? data.racial_type_id.toString() : '',
+              income_range_id: data.income_range_id ? data.income_range_id.toString() : '',
+              about_me: data.about_me || '',
             });
           } else {
             setError('Invalid person data');
@@ -122,9 +138,17 @@ export default function PersonDetail() {
         personal_id_number?: string;
         first_name?: string;
         last_name?: string;
+        middle_name?: string;
+        nick_name?: string;
         birth_date?: string;
+        gender_type_id?: number;
+        marital_status_type_id?: number;
+        country_id?: number;
         height?: number;
         weight?: number;
+        racial_type_id?: number;
+        income_range_id?: number;
+        about_me?: string;
       } = {};
       if (formData.username) updateData.username = formData.username;
       if (formData.email) updateData.email = formData.email;
@@ -132,9 +156,17 @@ export default function PersonDetail() {
       if (formData.personal_id_number) updateData.personal_id_number = formData.personal_id_number;
       if (formData.first_name) updateData.first_name = formData.first_name;
       if (formData.last_name) updateData.last_name = formData.last_name;
+      if (formData.middle_name) updateData.middle_name = formData.middle_name;
+      if (formData.nick_name) updateData.nick_name = formData.nick_name;
       if (formData.birth_date) updateData.birth_date = formData.birth_date;
+      if (formData.gender_type_id) updateData.gender_type_id = parseInt(formData.gender_type_id);
+      if (formData.marital_status_type_id) updateData.marital_status_type_id = parseInt(formData.marital_status_type_id);
+      if (formData.country_id) updateData.country_id = parseInt(formData.country_id);
       if (formData.height) updateData.height = parseFloat(formData.height);
       if (formData.weight) updateData.weight = parseFloat(formData.weight);
+      if (formData.racial_type_id) updateData.racial_type_id = parseInt(formData.racial_type_id);
+      if (formData.income_range_id) updateData.income_range_id = parseInt(formData.income_range_id);
+      if (formData.about_me) updateData.about_me = formData.about_me;
 
       if (Object.keys(updateData).length === 0) {
         setError('No changes to save');
@@ -318,9 +350,43 @@ export default function PersonDetail() {
               }}
             />
             <TextField
+              label="Middle Name"
+              name="middle_name"
+              value={formData.middle_name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
               label="Last Name"
               name="last_name"
               value={formData.last_name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Nick Name"
+              name="nick_name"
+              value={formData.nick_name}
               onChange={handleChange}
               fullWidth
               margin="normal"
@@ -344,6 +410,60 @@ export default function PersonDetail() {
               margin="normal"
               variant="outlined"
               InputLabelProps={{ style: { color: 'text.secondary' }, shrink: true }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Gender Type ID"
+              name="gender_type_id"
+              type="number"
+              value={formData.gender_type_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Marital Status Type ID"
+              name="marital_status_type_id"
+              type="number"
+              value={formData.marital_status_type_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Country ID"
+              name="country_id"
+              type="number"
+              value={formData.country_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
@@ -379,6 +499,61 @@ export default function PersonDetail() {
               fullWidth
               margin="normal"
               variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Racial Type ID"
+              name="racial_type_id"
+              type="number"
+              value={formData.racial_type_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="Income Range ID"
+              name="income_range_id"
+              type="number"
+              value={formData.income_range_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'text.secondary' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            <TextField
+              label="About Me"
+              name="about_me"
+              value={formData.about_me}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              multiline
+              rows={4}
               InputLabelProps={{ style: { color: 'text.secondary' } }}
               sx={{
                 '& .MuiOutlinedInput-root': {

@@ -1,3 +1,5 @@
+# backend/app/models/persons/person.py
+
 from app.config.database import database
 from app.schemas.person import PersonCreate, PersonUpdate, PersonOut
 from app.models.users.user import create_user, log_user_history, update_user, delete_user, get_user_password
@@ -94,7 +96,6 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
     async with database.transaction():
         try:
             user = UserCreate(username=person.username, email=person.email, password=person.password, role="person_user")
-            ## create_user จะ hash password เอง เราไม่ต้องไปทำให้มัน
             user_result = await create_user(user, action_by)
             
             if not user_result:
@@ -118,7 +119,6 @@ async def create_person(person: PersonCreate, action_by: Optional[int]) -> Optio
                           income_range_id, about_me, created_at, updated_at
             """
 
-            ## user_result.id คือ id ของ supertype จะเอาไปสร้าง subtype
             values = {
                 "id": user_result.id,
                 "personal_id_number": person.personal_id_number,
@@ -176,16 +176,16 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         values = {"id": person_id, "updated_at": datetime.utcnow()}
         query_parts = []
 
-        if person.personal_id_number is not None:
+        if person.personal_id_number is not None and person.personal_id_number != '':
             query_parts.append("personal_id_number = :personal_id_number")
             values["personal_id_number"] = person.personal_id_number
-        if person.first_name is not None:
+        if person.first_name is not None and person.first_name != '':
             query_parts.append("first_name = :first_name")
             values["first_name"] = person.first_name
         if person.middle_name is not None:
             query_parts.append("middle_name = :middle_name")
             values["middle_name"] = person.middle_name
-        if person.last_name is not None:
+        if person.last_name is not None and person.last_name != '':
             query_parts.append("last_name = :last_name")
             values["last_name"] = person.last_name
         if person.nick_name is not None:
@@ -222,36 +222,32 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         # Update user table if username, email, or password is provided
         user_values = {"id": person_id}
         user_query_parts = []
-        if person.username is not None:
+        if person.username is not None and person.username != '':
             user_query_parts.append("username = :username")
             user_values["username"] = person.username
-        if person.email is not None:
+        if person.email is not None and person.email != '':
             user_query_parts.append("email = :email")
             user_values["email"] = person.email
-        if person.password is not None:
+        if person.password is not None and person.password != '':
             user_query_parts.append("password = :password")
-            # ไม่ต้อง hash password ตอน update_user เดี๋ยวมัน hash ให้เราเอง
             user_values["password"] = person.password
 
         old_data = await get_person(person_id)
-        # update ตัวที่ไม่มีอยู่จริง ให้ return none ไปเลย
         if not old_data:
             return None
 
         user_result = None
         if user_query_parts:
             user_update = UserUpdate(
-                username=person.username,
-                email=person.email,
-                password=person.password,
+                username=person.username if person.username and person.username != '' else None,
+                email=person.email if person.email and person.email != '' else None,
+                password=person.password if person.password and person.password != '' else None,
                 role=None
             )
-            user_result = await update_user(user_update, action_by)
+            user_result = await update_user(person_id, user_update, action_by)
             if not user_result:
                 logger.warning(f"Failed to update user for person: id={person_id}")
                 return None
-            
-            ## ไม่ต้องไป log user history เพราะตอน update_user มัน log ให้เเล้ว
 
         if not query_parts and not user_query_parts:
             logger.info(f"No fields to update for person id={person_id}")
@@ -273,10 +269,10 @@ async def update_person(person_id: int, person: PersonUpdate, action_by: Optiona
         if result:
             await log_person_history(
                 person_id=person_id,
-                personal_id_number=person.personal_id_number if person.personal_id_number is not None else old_data.personal_id_number,
-                first_name=person.first_name if person.first_name is not None else old_data.first_name,
+                personal_id_number=person.personal_id_number if person.personal_id_number and person.personal_id_number != '' else old_data.personal_id_number,
+                first_name=person.first_name if person.first_name and person.first_name != '' else old_data.first_name,
                 middle_name=person.middle_name if person.middle_name is not None else old_data.middle_name,
-                last_name=person.last_name if person.last_name is not None else old_data.last_name,
+                last_name=person.last_name if person.last_name and person.last_name != '' else old_data.last_name,
                 nick_name=person.nick_name if person.nick_name is not None else old_data.nick_name,
                 birth_date=person.birth_date if person.birth_date is not None else old_data.birth_date,
                 gender_type_id=person.gender_type_id if person.gender_type_id is not None else old_data.gender_type_id,
