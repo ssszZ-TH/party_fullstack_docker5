@@ -32,7 +32,11 @@ const protectedroutes: ProtectedRoute[] = [
   { path: '/users', component: lazy(() => import('./pages/layer_account/Users')) },
   { path: '/users/:param', component: lazy(() => import('./pages/layer_account/UserDetail')) },
   { path: '/users-history', component: lazy(() => import('./pages/layer_account/UserHistory')) },
+  { path: '/persons', component: lazy(() => import('./pages/layer_informataions/Persons')) },
+  { path: '/persons/:param', component: lazy(() => import('./pages/layer_informataions/PersonDetail')) },
   { path: '/persons-history', component: lazy(() => import('./pages/layer_history/PersonHistory')) },
+  { path: '/organizations', component: lazy(() => import('./pages/layer_informataions/Organizations')) },
+  { path: '/organizations/:param', component: lazy(() => import('./pages/layer_informataions/OrganizationDetail')) },
   { path: '/organizations-history', component: lazy(() => import('./pages/layer_history/OrganizationHistory')) },
 ];
 

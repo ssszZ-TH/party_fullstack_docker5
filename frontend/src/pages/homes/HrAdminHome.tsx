@@ -28,13 +28,8 @@ const services = [
   {
     title: "Person Management",
     items: [
-      { name: "Person", path: "/v1/person" },
-      { name: "Person Name", path: "/v1/personname" },
-      { name: "Citizenship", path: "/v1/citizenship" },
-      { name: "Passport", path: "/v1/passport" },
-      { name: "Marital Status", path: "/v1/maritalstatus" },
-      { name: "Physical Characteristic", path: "/v1/physicalcharacteristic" },
-      { name: "Classify by EEOC", path: "/v1/classifybyeeoc" },
+      { name: "Persons", path: "/persons" },
+      { name: "Persons History", path: "/persons-history" },
     ],
   },
 ];
