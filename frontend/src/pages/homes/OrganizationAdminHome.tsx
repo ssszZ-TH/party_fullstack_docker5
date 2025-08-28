@@ -28,9 +28,8 @@ const services = [
   {
     title: "Organization Management",
     items: [
-      { name: "Organization Users", path: "/v1/organization_users" },
-      { name: "Organization Menu", path: "/v1/organizationmenu" },
-      { name: "Organization", path: "/v1/organization" },
+      { name: "Organizations", path: "/organizations" },
+      { name: "Organizations History", path: "/organizations-history" },
     ],
   },
 ];

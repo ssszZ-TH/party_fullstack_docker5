@@ -138,17 +138,17 @@ export default function PersonDetail() {
         personal_id_number?: string;
         first_name?: string;
         last_name?: string;
-        middle_name?: string;
-        nick_name?: string;
+        middle_name?: string | null;
+        nick_name?: string | null;
         birth_date?: string;
-        gender_type_id?: number;
-        marital_status_type_id?: number;
-        country_id?: number;
+        gender_type_id?: number | null;
+        marital_status_type_id?: number | null;
+        country_id?: number | null;
         height?: number;
         weight?: number;
-        racial_type_id?: number;
-        income_range_id?: number;
-        about_me?: string;
+        racial_type_id?: number | null;
+        income_range_id?: number | null;
+        about_me?: string | null;
       } = {};
       if (formData.username) updateData.username = formData.username;
       if (formData.email) updateData.email = formData.email;
@@ -157,16 +157,24 @@ export default function PersonDetail() {
       if (formData.first_name) updateData.first_name = formData.first_name;
       if (formData.last_name) updateData.last_name = formData.last_name;
       if (formData.middle_name) updateData.middle_name = formData.middle_name;
+      else if (formData.middle_name === '') updateData.middle_name = null;
       if (formData.nick_name) updateData.nick_name = formData.nick_name;
+      else if (formData.nick_name === '') updateData.nick_name = null;
       if (formData.birth_date) updateData.birth_date = formData.birth_date;
       if (formData.gender_type_id) updateData.gender_type_id = parseInt(formData.gender_type_id);
+      else if (formData.gender_type_id === '') updateData.gender_type_id = null;
       if (formData.marital_status_type_id) updateData.marital_status_type_id = parseInt(formData.marital_status_type_id);
+      else if (formData.marital_status_type_id === '') updateData.marital_status_type_id = null;
       if (formData.country_id) updateData.country_id = parseInt(formData.country_id);
-      if (formData.height) updateData.height = parseFloat(formData.height);
-      if (formData.weight) updateData.weight = parseFloat(formData.weight);
+      else if (formData.country_id === '') updateData.country_id = null;
+      if (formData.height) updateData.height = parseInt(formData.height);
+      if (formData.weight) updateData.weight = parseInt(formData.weight);
       if (formData.racial_type_id) updateData.racial_type_id = parseInt(formData.racial_type_id);
+      else if (formData.racial_type_id === '') updateData.racial_type_id = null;
       if (formData.income_range_id) updateData.income_range_id = parseInt(formData.income_range_id);
+      else if (formData.income_range_id === '') updateData.income_range_id = null;
       if (formData.about_me) updateData.about_me = formData.about_me;
+      else if (formData.about_me === '') updateData.about_me = null;
 
       if (Object.keys(updateData).length === 0) {
         setError('No changes to save');
@@ -177,7 +185,7 @@ export default function PersonDetail() {
         if (!formData.username || !formData.email || !formData.password || 
             !formData.personal_id_number || !formData.first_name || 
             !formData.last_name || !formData.birth_date || !formData.height || !formData.weight) {
-          setError('All required fields must be filled for creating a new person');
+          setError('All required fields (username, email, password, personal_id_number, first_name, last_name, birth_date, height, weight) must be filled for creating a new person');
           return;
         }
         await createPerson({
@@ -187,9 +195,17 @@ export default function PersonDetail() {
           personal_id_number: formData.personal_id_number,
           first_name: formData.first_name,
           last_name: formData.last_name,
+          middle_name: formData.middle_name || null,
+          nick_name: formData.nick_name || null,
           birth_date: formData.birth_date,
-          height: parseFloat(formData.height),
-          weight: parseFloat(formData.weight),
+          gender_type_id: formData.gender_type_id ? parseInt(formData.gender_type_id) : null,
+          marital_status_type_id: formData.marital_status_type_id ? parseInt(formData.marital_status_type_id) : null,
+          country_id: formData.country_id ? parseInt(formData.country_id) : null,
+          height: parseInt(formData.height),
+          weight: parseInt(formData.weight),
+          racial_type_id: formData.racial_type_id ? parseInt(formData.racial_type_id) : null,
+          income_range_id: formData.income_range_id ? parseInt(formData.income_range_id) : null,
+          about_me: formData.about_me || null,
         });
       } else if (param && !isNaN(Number(param))) {
         if (Object.keys(updateData).length === 1 && updateData.email) {

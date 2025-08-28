@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Box, Container, Typography, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getPersons } from '../../services/persons';
-import { useTheme } from '../../contexts/ThemeContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import DataTable from '../../components/DataTable';
 import AppBarCustom from '../../components/AppBarCustom';
@@ -11,7 +10,7 @@ import UpdateButton from '../../components/buttons/UpdateButton';
 import AddButton from '../../components/buttons/AddButton';
 import Loading from '../../components/Loading';
 import { GridColDef } from '@mui/x-data-grid';
-import { formatDateTime } from '../../utils/time_util';
+import { formatDate, formatDateTime } from '../../utils/time_util';
 
 interface Person {
   id: number;
@@ -19,24 +18,23 @@ interface Person {
   email: string;
   personal_id_number: string;
   first_name: string;
-  middle_name: string | null;
+  middle_name?: string | null;
   last_name: string;
-  nick_name: string | null;
+  nick_name?: string | null;
   birth_date: string;
-  gender_type_id: number | null;
-  marital_status_type_id: number | null;
-  country_id: number | null;
+  gender_type_id?: number | null;
+  marital_status_type_id?: number | null;
+  country_id?: number | null;
   height: number;
   weight: number;
-  racial_type_id: number | null;
-  income_range_id: number | null;
-  about_me: string | null;
+  racial_type_id?: number | null;
+  income_range_id?: number | null;
+  about_me?: string | null;
   created_at: string;
-  updated_at: string | null;
+  updated_at?: string | null;
 }
 
 export default function Persons() {
-  const { isDarkMode } = useTheme();
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [persons, setPersons] = useState<Person[]>([]);
@@ -56,7 +54,7 @@ export default function Persons() {
         }
         const data = await getPersons();
         if (Array.isArray(data)) {
-          setPersons(data.filter(person => person && typeof person === 'object' && 'id' in person));
+          setPersons(data as Person[]);
           setError(null);
         } else {
           setError('Invalid data format received');
@@ -101,7 +99,7 @@ export default function Persons() {
       field: 'birth_date',
       headerName: 'Birth Date',
       width: 150,
-      valueFormatter: (value: string | null) => value ? new Date(value).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' }) : 'N/A',
+      valueFormatter: (value: string | null) => formatDate(value),
     },
     { field: 'gender_type_id', headerName: 'Gender Type ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
     { field: 'marital_status_type_id', headerName: 'Marital Status ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },

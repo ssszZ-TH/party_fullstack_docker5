@@ -22,7 +22,7 @@ interface Person {
   income_range_id?: number | null;
   about_me?: string | null;
   created_at: string;
-  updated_at: string | null;
+  updated_at?: string | null;
 }
 
 interface RegisterData {
@@ -32,9 +32,17 @@ interface RegisterData {
   personal_id_number: string;
   first_name: string;
   last_name: string;
+  middle_name?: string | null;
+  nick_name?: string | null;
   birth_date: string;
+  gender_type_id?: number | null;
+  marital_status_type_id?: number | null;
+  country_id?: number | null;
   height: number;
   weight: number;
+  racial_type_id?: number | null;
+  income_range_id?: number | null;
+  about_me?: string | null;
 }
 
 interface UpdateData {
@@ -44,17 +52,17 @@ interface UpdateData {
   personal_id_number?: string;
   first_name?: string;
   last_name?: string;
-  middle_name?: string;
-  nick_name?: string;
+  middle_name?: string | null;
+  nick_name?: string | null;
   birth_date?: string;
-  gender_type_id?: number;
-  marital_status_type_id?: number;
-  country_id?: number;
+  gender_type_id?: number | null;
+  marital_status_type_id?: number | null;
+  country_id?: number | null;
   height?: number;
   weight?: number;
-  racial_type_id?: number;
-  income_range_id?: number;
-  about_me?: string;
+  racial_type_id?: number | null;
+  income_range_id?: number | null;
+  about_me?: string | null;
 }
 
 export const createPerson = async (data: RegisterData) => {
