@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Container, Typography, Paper, Stack, TextField } from '@mui/material';
+import { Box, Container, Typography, Paper, Stack, TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getPersonById, updatePerson, createPerson, deletePerson } from '../../services/persons';
+import { getGenderTypes } from '../../services/genderTypes';
+import { getMaritalStatusTypes } from '../../services/maritalStatusTypes';
+import { getCountries } from '../../services/countries';
+import { getRacialTypes } from '../../services/racialTypes';
+import { getIncomeRanges } from '../../services/incomeRanges';
 import { useTheme } from '../../contexts/ThemeContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import AppBarCustom from '../../components/AppBarCustom';
@@ -31,6 +36,32 @@ interface Person {
   about_me?: string | null;
   created_at?: string;
   updated_at?: string | null;
+}
+
+interface GenderType {
+  id: number;
+  description: string;
+}
+
+interface MaritalStatusType {
+  id: number;
+  description: string;
+}
+
+interface Country {
+  id: number;
+  iso_code: string;
+  name_en: string;
+}
+
+interface RacialType {
+  id: number;
+  description: string;
+}
+
+interface IncomeRange {
+  id: number;
+  description: string;
 }
 
 export default function PersonDetail() {
@@ -68,15 +99,16 @@ export default function PersonDetail() {
     income_range_id: '',
     about_me: '',
   });
+  const [genderTypes, setGenderTypes] = useState<GenderType[]>([]);
+  const [maritalStatusTypes, setMaritalStatusTypes] = useState<MaritalStatusType[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [racialTypes, setRacialTypes] = useState<RacialType[]>([]);
+  const [incomeRanges, setIncomeRanges] = useState<IncomeRange[]>([]);
   const [loading, setLoading] = useState(!isCreateMode);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPerson = async () => {
-      if (isCreateMode) {
-        setLoading(false);
-        return;
-      }
+    const fetchData = async () => {
       try {
         const token = Cookies.get('access_token');
         if (!token) {
@@ -85,7 +117,22 @@ export default function PersonDetail() {
           navigate('/login');
           return;
         }
-        if (param && !isNaN(Number(param))) {
+
+        const [genderTypesData, maritalStatusTypesData, countriesData, racialTypesData, incomeRangesData] = await Promise.all([
+          getGenderTypes(),
+          getMaritalStatusTypes(),
+          getCountries(),
+          getRacialTypes(),
+          getIncomeRanges(),
+        ]);
+
+        setGenderTypes(genderTypesData);
+        setMaritalStatusTypes(maritalStatusTypesData);
+        setCountries(countriesData);
+        setRacialTypes(racialTypesData);
+        setIncomeRanges(incomeRangesData);
+
+        if (!isCreateMode && param && !isNaN(Number(param))) {
           const data = await getPersonById(parseInt(param));
           if (data && typeof data === 'object' && 'id' in data) {
             setPerson(data);
@@ -111,21 +158,19 @@ export default function PersonDetail() {
           } else {
             setError('Invalid person data');
           }
-        } else {
-          setError('Invalid person ID');
         }
       } catch (error) {
-        console.error('Error fetching person:', error);
-        setError('Failed to load person');
-        navigate('/persons');
+        console.error('Error fetching data:', error);
+        setError('Failed to load data');
+        if (!isCreateMode) navigate('/persons');
       } finally {
         setLoading(false);
       }
     };
-    fetchPerson();
+    fetchData();
   }, [param, navigate, isCreateMode, logout]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -434,60 +479,87 @@ export default function PersonDetail() {
                 },
               }}
             />
-            <TextField
-              label="Gender Type ID"
-              name="gender_type_id"
-              type="number"
-              value={formData.gender_type_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Gender</InputLabel>
+              <Select
+                name="gender_type_id"
+                value={formData.gender_type_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
-            <TextField
-              label="Marital Status Type ID"
-              name="marital_status_type_id"
-              type="number"
-              value={formData.marital_status_type_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
-            <TextField
-              label="Country ID"
-              name="country_id"
-              type="number"
-              value={formData.country_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {genderTypes.map((gender) => (
+                  <MenuItem key={gender.id} value={gender.id}>
+                    {gender.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Marital Status</InputLabel>
+              <Select
+                name="marital_status_type_id"
+                value={formData.marital_status_type_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {maritalStatusTypes.map((status) => (
+                  <MenuItem key={status.id} value={status.id}>
+                    {status.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Country</InputLabel>
+              <Select
+                name="country_id"
+                value={formData.country_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {countries.map((country) => (
+                  <MenuItem key={country.id} value={country.id}>
+                    {`${country.iso_code} (${country.name_en})`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               label="Height (cm)"
               name="height"
@@ -524,42 +596,60 @@ export default function PersonDetail() {
                 },
               }}
             />
-            <TextField
-              label="Racial Type ID"
-              name="racial_type_id"
-              type="number"
-              value={formData.racial_type_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Racial Type</InputLabel>
+              <Select
+                name="racial_type_id"
+                value={formData.racial_type_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
-            <TextField
-              label="Income Range ID"
-              name="income_range_id"
-              type="number"
-              value={formData.income_range_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {racialTypes.map((racial) => (
+                  <MenuItem key={racial.id} value={racial.id}>
+                    {racial.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Income Range</InputLabel>
+              <Select
+                name="income_range_id"
+                value={formData.income_range_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {incomeRanges.map((income) => (
+                  <MenuItem key={income.id} value={income.id}>
+                    {income.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               label="About Me"
               name="about_me"
