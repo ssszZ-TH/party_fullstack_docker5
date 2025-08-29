@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Container, Typography, Paper, Stack, TextField } from '@mui/material';
+import { Box, Container, Typography, Paper, Stack, TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getOrganizationById, updateOrganization, createOrganization, deleteOrganization } from '../../services/organizations';
+import { getOrganizationTypes } from '../../services/organizationTypes';
+import { getIndustryTypes } from '../../services/industryTypes';
 import { useTheme } from '../../contexts/ThemeContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import AppBarCustom from '../../components/AppBarCustom';
@@ -24,6 +26,17 @@ interface Organization {
   slogan?: string | null;
   created_at?: string;
   updated_at?: string | null;
+}
+
+interface OrganizationType {
+  id: number;
+  description: string;
+}
+
+interface IndustryType {
+  id: number;
+  naisc: string;
+  description: string;
 }
 
 export default function OrganizationDetail() {
@@ -49,15 +62,13 @@ export default function OrganizationDetail() {
     employee_count: '',
     slogan: '',
   });
+  const [organizationTypes, setOrganizationTypes] = useState<OrganizationType[]>([]);
+  const [industryTypes, setIndustryTypes] = useState<IndustryType[]>([]);
   const [loading, setLoading] = useState(!isCreateMode);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrganization = async () => {
-      if (isCreateMode) {
-        setLoading(false);
-        return;
-      }
+    const fetchData = async () => {
       try {
         const token = Cookies.get('access_token');
         if (!token) {
@@ -66,7 +77,16 @@ export default function OrganizationDetail() {
           navigate('/login');
           return;
         }
-        if (param && !isNaN(Number(param))) {
+
+        const [organizationTypesData, industryTypesData] = await Promise.all([
+          getOrganizationTypes(),
+          getIndustryTypes(),
+        ]);
+
+        setOrganizationTypes(organizationTypesData);
+        setIndustryTypes(industryTypesData);
+
+        if (!isCreateMode && param && !isNaN(Number(param))) {
           const data = await getOrganizationById(parseInt(param));
           if (data && typeof data === 'object' && 'id' in data) {
             setOrganization(data);
@@ -85,21 +105,19 @@ export default function OrganizationDetail() {
           } else {
             setError('Invalid organization data');
           }
-        } else {
-          setError('Invalid organization ID');
         }
       } catch (error) {
-        console.error('Error fetching organization:', error);
-        setError('Failed to load organization');
-        navigate('/organizations');
+        console.error('Error fetching data:', error);
+        setError('Failed to load data');
+        if (!isCreateMode) navigate('/organizations');
       } finally {
         setLoading(false);
       }
     };
-    fetchOrganization();
+    fetchData();
   }, [param, navigate, isCreateMode, logout]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -331,42 +349,60 @@ export default function OrganizationDetail() {
                 },
               }}
             />
-            <TextField
-              label="Organization Type ID"
-              name="organization_type_id"
-              type="number"
-              value={formData.organization_type_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Organization Type</InputLabel>
+              <Select
+                name="organization_type_id"
+                value={formData.organization_type_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
-            <TextField
-              label="Industry Type ID"
-              name="industry_type_id"
-              type="number"
-              value={formData.industry_type_id}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ style: { color: 'text.secondary' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'primary.main',
                   },
-                },
-              }}
-            />
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {organizationTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel sx={{ color: 'text.secondary' }}>Industry Type</InputLabel>
+              <Select
+                name="industry_type_id"
+                value={formData.industry_type_id}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: isDarkMode ? 'divider' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {industryTypes.map((industry) => (
+                  <MenuItem key={industry.id} value={industry.id}>
+                    {`${industry.naisc} - ${industry.description}`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               label="Employee Count"
               name="employee_count"

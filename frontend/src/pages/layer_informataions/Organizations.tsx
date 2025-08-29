@@ -3,6 +3,8 @@ import { Box, Container, Typography, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getOrganizations } from '../../services/organizations';
+import { getOrganizationTypes } from '../../services/organizationTypes';
+import { getIndustryTypes } from '../../services/industryTypes';
 import { AuthContext } from '../../contexts/AuthContext';
 import DataTable from '../../components/DataTable';
 import AppBarCustom from '../../components/AppBarCustom';
@@ -20,7 +22,9 @@ interface Organization {
   name_en: string;
   name_th?: string | null;
   organization_type_id?: number | null;
+  organization_type_description?: string | null;
   industry_type_id?: number | null;
+  industry_type_description?: string | null;
   employee_count?: number | null;
   slogan?: string | null;
   created_at: string;
@@ -35,7 +39,7 @@ export default function Organizations() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrganizations = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
         const token = Cookies.get('access_token');
@@ -45,9 +49,19 @@ export default function Organizations() {
           navigate('/login');
           return;
         }
-        const data = await getOrganizations();
-        if (Array.isArray(data)) {
-          setOrganizations(data as Organization[]);
+        const [organizationData, organizationTypes, industryTypes] = await Promise.all([
+          getOrganizations(),
+          getOrganizationTypes(),
+          getIndustryTypes(),
+        ]);
+
+        if (Array.isArray(organizationData)) {
+          const enrichedOrganizations = organizationData.map(org => ({
+            ...org,
+            organization_type_description: organizationTypes.find(t => t.id === org.organization_type_id)?.description || 'N/A',
+            industry_type_description: industryTypes.find(i => i.id === org.industry_type_id)?.description || 'N/A',
+          }));
+          setOrganizations(enrichedOrganizations);
           setError(null);
         } else {
           setError('Invalid data format received');
@@ -64,7 +78,7 @@ export default function Organizations() {
         setLoading(false);
       }
     };
-    fetchOrganizations();
+    fetchData();
   }, [navigate, logout]);
 
   const columns: GridColDef[] = [
@@ -86,8 +100,8 @@ export default function Organizations() {
     { field: 'federal_tax_id', headerName: 'Federal Tax ID', width: 150, valueFormatter: (value: string | null) => value || 'N/A' },
     { field: 'name_en', headerName: 'Name (EN)', width: 150 },
     { field: 'name_th', headerName: 'Name (TH)', width: 150, valueFormatter: (value: string | null) => value || 'N/A' },
-    { field: 'organization_type_id', headerName: 'Org Type ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
-    { field: 'industry_type_id', headerName: 'Industry Type ID', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
+    { field: 'organization_type_description', headerName: 'Organization Type', width: 150 },
+    { field: 'industry_type_description', headerName: 'Industry Type', width: 150 },
     { field: 'employee_count', headerName: 'Employee Count', width: 120, valueFormatter: (value: number | null) => value ?? 'N/A' },
     { field: 'slogan', headerName: 'Slogan', width: 200, valueFormatter: (value: string | null) => value || 'N/A' },
     {
