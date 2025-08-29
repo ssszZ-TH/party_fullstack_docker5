@@ -1,83 +1,57 @@
-import axios from "axios";
-import Cookies from "js-cookie";
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-const BASE_URL = "http://localhost:8080/v1/communicationeventpurposetype";
+const BASE_URL = 'http://localhost:8080';
 
-const logError = (method: string, error: any) => {
-  console.error(`Error in ${method} request to ${BASE_URL}:`, {
-    message: error.message,
-    status: error.response?.status,
-    data: error.response?.data,
-    stack: error.stack,
-  });
-};
-
-const api = axios.create({
-  baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  timeout: 10000,
-});
-
-api.interceptors.request.use((config) => {
-  const token = Cookies.get("access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-export async function list() {
-  try {
-    const res = await api.get("/");
-    return res.data;
-  } catch (error: any) {
-    logError("list", error);
-    throw error;
-  }
-}
-
-export async function get({ id }: { id: number }) {
-  try {
-    const res = await api.get(`/${id}`);
-    return res.data;
-  } catch (error: any) {
-    logError("get", error);
-    throw error;
-  }
-}
-
-export async function create({ description }: { description: string }) {
-  try {
-    const res = await api.post("/", { description });
-    return res.data;
-  } catch (error: any) {
-    logError("create", error);
-    throw error;
-  }
-}
-
-export async function update({
-  id,
-  description,
-}: {
+interface CommunicationEventPurposeType {
   id: number;
   description: string;
-}) {
-  try {
-    const res = await api.put(`/${id}`, { description });
-    return res.data;
-  } catch (error: any) {
-    logError("update", error);
-    throw error;
-  }
 }
 
-export async function deleteById({ id }: { id: number }) {
-  try {
-    const res = await api.delete(`/${id}`);
-    return res.data;
-  } catch (error: any) {
-    logError("deleteById", error);
-    throw error;
-  }
+interface CreateData {
+  description: string;
 }
+
+interface UpdateData {
+  description?: string;
+}
+
+export const createCommunicationEventPurposeType = async (data: CreateData) => {
+  const token = Cookies.get('access_token');
+  const response = await axios.post(`${BASE_URL}/communication_event_purpose_types`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getCommunicationEventPurposeTypes = async (): Promise<CommunicationEventPurposeType[]> => {
+  const token = Cookies.get('access_token');
+  const response = await axios.get(`${BASE_URL}/communication_event_purpose_types`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getCommunicationEventPurposeTypeById = async (id: number): Promise<CommunicationEventPurposeType> => {
+  const token = Cookies.get('access_token');
+  const response = await axios.get(`${BASE_URL}/communication_event_purpose_types/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const updateCommunicationEventPurposeType = async (id: number, data: UpdateData) => {
+  const token = Cookies.get('access_token');
+  const response = await axios.put(`${BASE_URL}/communication_event_purpose_types/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const deleteCommunicationEventPurposeType = async (id: number) => {
+  const token = Cookies.get('access_token');
+  const response = await axios.delete(`${BASE_URL}/communication_event_purpose_types/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};

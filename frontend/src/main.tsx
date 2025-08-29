@@ -17,27 +17,52 @@ interface UnprotectedRoute {
 }
 
 const protectedroutes: ProtectedRoute[] = [
+  // home pages
   { path: '/homes/system-admin', component: lazy(() => import('./pages/homes/SystemAdminHome')) },
   { path: '/homes/basetype-admin', component: lazy(() => import('./pages/homes/BasetypeAdminHome')) },
   { path: '/homes/hr-admin', component: lazy(() => import('./pages/homes/HrAdminHome')) },
   { path: '/homes/organization-admin', component: lazy(() => import('./pages/homes/OrganizationAdminHome')) },
   { path: '/homes/organization-user', component: lazy(() => import('./pages/homes/OrganizationUserHome')) },
   { path: '/homes/person-user', component: lazy(() => import('./pages/homes/PersonUserHome')) },
+  // profile pages
   { path: '/profiles/person-user', component: lazy(() => import('./pages/profiles/PersonUserProfile')) },
   { path: '/profiles/hr-admin', component: lazy(() => import('./pages/profiles/HrAdminProfile')) },
   { path: '/profiles/organization-admin', component: lazy(() => import('./pages/profiles/OrganizationAdminProfile')) },
   { path: '/profiles/organization-user', component: lazy(() => import('./pages/profiles/OrganizationUserProfile')) },
   { path: '/profiles/basetype-admin', component: lazy(() => import('./pages/profiles/BasetypeAdminProfile')) },
   { path: '/profiles/system-admin', component: lazy(() => import('./pages/profiles/SystemAdminProfile')) },
+  // layer account
   { path: '/users', component: lazy(() => import('./pages/layer_account/Users')) },
   { path: '/users/:param', component: lazy(() => import('./pages/layer_account/UserDetail')) },
   { path: '/users-history', component: lazy(() => import('./pages/layer_account/UserHistory')) },
+  // layer info
   { path: '/persons', component: lazy(() => import('./pages/layer_informataions/Persons')) },
   { path: '/persons/:param', component: lazy(() => import('./pages/layer_informataions/PersonDetail')) },
   { path: '/persons-history', component: lazy(() => import('./pages/layer_history/PersonHistory')) },
   { path: '/organizations', component: lazy(() => import('./pages/layer_informataions/Organizations')) },
   { path: '/organizations/:param', component: lazy(() => import('./pages/layer_informataions/OrganizationDetail')) },
   { path: '/organizations-history', component: lazy(() => import('./pages/layer_history/OrganizationHistory')) },
+  // layer type
+  { path: '/gender-type', component: lazy(() => import('./pages/layer_types/GenderType')) },
+  { path: '/gender-type/:param', component: lazy(() => import('./pages/layer_types/GenderTypeDetail')) },
+  { path: '/communication-event-purpose-type', component: lazy(() => import('./pages/layer_types/CommunicationEventPurposeType')) },
+  { path: '/communication-event-purpose-type/:param', component: lazy(() => import('./pages/layer_types/CommunicationEventPurposeTypeDetail')) },
+  { path: '/communication-event-status-type', component: lazy(() => import('./pages/layer_types/CommunicationEventStatusType')) },
+  { path: '/communication-event-status-type/:param', component: lazy(() => import('./pages/layer_types/CommunicationEventStatusTypeDetail')) },
+  { path: '/contact-mechanism-type', component: lazy(() => import('./pages/layer_types/ContactMechanismType')) },
+  { path: '/contact-mechanism-type/:param', component: lazy(() => import('./pages/layer_types/ContactMechanismTypeDetail')) },
+  { path: '/country', component: lazy(() => import('./pages/layer_types/Country')) },
+  { path: '/country/:param', component: lazy(() => import('./pages/layer_types/CountryDetail')) },
+  { path: '/income-range', component: lazy(() => import('./pages/layer_types/IncomeRange')) },
+  { path: '/income-range/:param', component: lazy(() => import('./pages/layer_types/IncomeRangeDetail')) },
+  { path: '/industry-type', component: lazy(() => import('./pages/layer_types/IndustryType')) },
+  { path: '/industry-type/:param', component: lazy(() => import('./pages/layer_types/IndustryTypeDetail')) },
+  { path: '/marital-status-type', component: lazy(() => import('./pages/layer_types/MaritalStatusType')) },
+  { path: '/marital-status-type/:param', component: lazy(() => import('./pages/layer_types/MaritalStatusTypeDetail')) },
+  { path: '/organization-type', component: lazy(() => import('./pages/layer_types/OrganizationType')) },
+  { path: '/organization-type/:param', component: lazy(() => import('./pages/layer_types/OrganizationTypeDetail')) },
+  { path: '/racial-type', component: lazy(() => import('./pages/layer_types/RacialType')) },
+  { path: '/racial-type/:param', component: lazy(() => import('./pages/layer_types/RacialTypeDetail')) },
 ];
 
 const unprotectedroutes: UnprotectedRoute[] = [
