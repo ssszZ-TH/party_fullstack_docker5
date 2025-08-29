@@ -26,12 +26,12 @@ async def create_racial_type_endpoint(racial_type: RacialTypeCreate, current_use
     logger.info(f"Created racial_type: id={result.id}")
     return result
 
-# ดึงข้อมูล racial_type ตาม ID (basetype_admin เท่านั้น)
+# ดึงข้อมูล racial_type ตาม ID
 @router.get("/{racial_type_id}", response_model=RacialTypeOut)
 async def get_racial_type_endpoint(racial_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to get racial_type by id={racial_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     result = await get_racial_type(racial_type_id)
     if not result:
         logger.warning(f"Racial_type not found: id={racial_type_id}")
@@ -39,12 +39,12 @@ async def get_racial_type_endpoint(racial_type_id: int, current_user: dict = Dep
     logger.info(f"Retrieved racial_type: id={racial_type_id}")
     return result
 
-# ดึงข้อมูล racial_type ทั้งหมด (basetype_admin เท่านั้น)
+# ดึงข้อมูล racial_type ทั้งหมด
 @router.get("/", response_model=List[RacialTypeOut])
 async def get_all_racial_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to list all racial_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     results = await get_all_racial_types()
     logger.info(f"Retrieved {len(results)} racial_types")
     return results

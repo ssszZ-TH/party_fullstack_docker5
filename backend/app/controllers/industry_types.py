@@ -26,12 +26,12 @@ async def create_industry_type_endpoint(industry_type: IndustryTypeCreate, curre
     logger.info(f"Created industry_type: id={result.id}")
     return result
 
-# ดึงข้อมูล industry_type ตาม ID (basetype_admin เท่านั้น)
+# ดึงข้อมูล industry_type ตาม ID
 @router.get("/{industry_type_id}", response_model=IndustryTypeOut)
 async def get_industry_type_endpoint(industry_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to get industry_type by id={industry_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     result = await get_industry_type(industry_type_id)
     if not result:
         logger.warning(f"Industry_type not found: id={industry_type_id}")
@@ -39,12 +39,12 @@ async def get_industry_type_endpoint(industry_type_id: int, current_user: dict =
     logger.info(f"Retrieved industry_type: id={industry_type_id}")
     return result
 
-# ดึงข้อมูล industry_type ทั้งหมด (basetype_admin เท่านั้น)
+# ดึงข้อมูล industry_type ทั้งหมด
 @router.get("/", response_model=List[IndustryTypeOut])
 async def get_all_industry_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to list all industry_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     results = await get_all_industry_types()
     logger.info(f"Retrieved {len(results)} industry_types")
     return results

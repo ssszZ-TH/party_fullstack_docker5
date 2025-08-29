@@ -26,12 +26,12 @@ async def create_communication_event_purpose_type_endpoint(communication_event_p
     logger.info(f"Created communication_event_purpose_type: id={result.id}")
     return result
 
-# ดึงข้อมูล communication_event_purpose_type ตาม ID (basetype_admin เท่านั้น)
+# ดึงข้อมูล communication_event_purpose_type ตาม ID
 @router.get("/{communication_event_purpose_type_id}", response_model=CommunicationEventPurposeTypeOut)
 async def get_communication_event_purpose_type_endpoint(communication_event_purpose_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to get communication_event_purpose_type by id={communication_event_purpose_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     result = await get_communication_event_purpose_type(communication_event_purpose_type_id)
     if not result:
         logger.warning(f"Communication_event_purpose_type not found: id={communication_event_purpose_type_id}")
@@ -39,12 +39,12 @@ async def get_communication_event_purpose_type_endpoint(communication_event_purp
     logger.info(f"Retrieved communication_event_purpose_type: id={communication_event_purpose_type_id}")
     return result
 
-# ดึงข้อมูล communication_event_purpose_type ทั้งหมด (basetype_admin เท่านั้น)
+# ดึงข้อมูล communication_event_purpose_type ทั้งหมด
 @router.get("/", response_model=List[CommunicationEventPurposeTypeOut])
 async def get_all_communication_event_purpose_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "basetype_admin":
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
         logger.warning(f"Unauthorized attempt to list all communication_event_purpose_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Basetype admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
     results = await get_all_communication_event_purpose_types()
     logger.info(f"Retrieved {len(results)} communication_event_purpose_types")
     return results
