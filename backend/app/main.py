@@ -17,6 +17,9 @@ from app.controllers.industry_types import router as industry_type_router
 from app.controllers.contact_mechanism_types import router as contact_mechanism_type_router
 from app.controllers.communication_event_status_types import router as communication_event_status_type_router
 from app.controllers.communication_event_purpose_types import router as communication_event_purpose_type_router
+from app.controllers.users_history import router as users_history_router
+from app.controllers.person_history import router as person_history_router
+from app.controllers.organization_history import router as organization_history_router
 
 load_dotenv()
 
@@ -53,6 +56,9 @@ app.include_router(industry_type_router)
 app.include_router(contact_mechanism_type_router)
 app.include_router(communication_event_status_type_router)
 app.include_router(communication_event_purpose_type_router)
+app.include_router(users_history_router)
+app.include_router(person_history_router)
+app.include_router(organization_history_router)
 
 @app.get("/")
 async def root():
