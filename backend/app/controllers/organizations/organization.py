@@ -26,12 +26,12 @@ async def create_organization_endpoint(organization: OrganizationCreate, current
     logger.info(f"Created organization: id={result.id}")
     return result
 
-# ดึงข้อมูล organization ตาม ID (organization_admin เท่านั้น)
+# ดึงข้อมูล organization ตาม ID
 @router.get("/{organization_id}", response_model=OrganizationOut)
 async def get_organization_endpoint(organization_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "organization_admin":
+    if current_user["role"] not in ["organization_admin", "organization_user", "person_user"]:
         logger.warning(f"Unauthorized attempt to get organization by id={organization_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Organization admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to organization_admin, organization_user, or person_user")
     result = await get_organization(organization_id)
     if not result:
         logger.warning(f"Organization not found: id={organization_id}")
@@ -39,12 +39,12 @@ async def get_organization_endpoint(organization_id: int, current_user: dict = D
     logger.info(f"Retrieved organization: id={organization_id}")
     return result
 
-# ดึงข้อมูล organization ทั้งหมด (organization_admin เท่านั้น)
+# ดึงข้อมูล organization ทั้งหมด
 @router.get("/", response_model=List[OrganizationOut])
 async def get_all_organizations_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "organization_admin":
+    if current_user["role"] not in ["organization_admin", "organization_user", "person_user"]:
         logger.warning(f"Unauthorized attempt to list all organizations by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Organization admin access required")
+        raise HTTPException(status_code=403, detail="Access restricted to organization_admin, organization_user, or person_user")
     results = await get_all_organizations()
     logger.info(f"Retrieved {len(results)} organizations")
     return results
