@@ -34,7 +34,7 @@ const protectedroutes: ProtectedRoute[] = [
   // layer account
   { path: '/users', component: lazy(() => import('./pages/layer_account/Users')) },
   { path: '/users/:param', component: lazy(() => import('./pages/layer_account/UserDetail')) },
-  { path: '/users-history', component: lazy(() => import('./pages/layer_account/UserHistory')) },
+  { path: '/users-history', component: lazy(() => import('./pages/layer_history/UserHistory')) },
   // layer info
   { path: '/persons', component: lazy(() => import('./pages/layer_informataions/Persons')) },
   { path: '/persons/:param', component: lazy(() => import('./pages/layer_informataions/PersonDetail')) },
