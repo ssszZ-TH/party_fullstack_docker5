@@ -62,9 +62,9 @@ export default function CommunicationEvents() {
             const person = persons.find(p => p.id === event.to_user_id);
             const organization = organizations.find(o => o.id === event.to_user_id);
             const to_user_name = person 
-              ? `${person.first_name} ${person.last_name} ${person.about_me || ''}`.trim()
+              ? `${person.id} - ${person.first_name} ${person.last_name} ${person.about_me || ''} (Person)`.trim()
               : organization 
-                ? `${organization.name_en} ${organization.slogan || ''}`.trim()
+                ? `${organization.id} - ${organization.name_en} ${organization.slogan || ''} (Organization)`.trim()
                 : 'N/A';
             return {
               ...event,
@@ -110,7 +110,7 @@ export default function CommunicationEvents() {
     { field: 'title', headerName: 'Title', width: 200 },
     { field: 'detail', headerName: 'Detail', width: 200, valueFormatter: (value: string | null) => value || 'N/A' },
     { field: 'from_user_id', headerName: 'From User ID', width: 120 },
-    { field: 'to_user_name', headerName: 'To User', width: 200 },
+    { field: 'to_user_name', headerName: 'To User', width: 300 },
     { field: 'contact_mechanism_type_description', headerName: 'Contact Mechanism', width: 150 },
     { field: 'communication_event_status_type_description', headerName: 'Status', width: 150 },
     {

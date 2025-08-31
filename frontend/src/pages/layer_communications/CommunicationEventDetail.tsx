@@ -93,12 +93,12 @@ export default function CommunicationEventDetail() {
         const userOptionsData = [
           ...persons.map(p => ({
             id: p.id,
-            label: `${p.first_name} ${p.last_name} ${p.about_me || ''}`.trim(),
+            label: `${p.id} - ${p.first_name} ${p.last_name} ${p.about_me || ''} (Person)`.trim(),
             type: 'person' as const,
           })),
           ...organizations.map(o => ({
             id: o.id,
-            label: `${o.name_en} ${o.slogan || ''}`.trim(),
+            label: `${o.id} - ${o.name_en} ${o.slogan || ''} (Organization)`.trim(),
             type: 'organization' as const,
           })),
         ];
