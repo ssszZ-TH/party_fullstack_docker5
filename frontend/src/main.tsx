@@ -63,6 +63,10 @@ const protectedroutes: ProtectedRoute[] = [
   { path: '/organization-type/:param', component: lazy(() => import('./pages/layer_types/OrganizationTypeDetail')) },
   { path: '/racial-type', component: lazy(() => import('./pages/layer_types/RacialType')) },
   { path: '/racial-type/:param', component: lazy(() => import('./pages/layer_types/RacialTypeDetail')) },
+  // layer communication
+  { path: '/communication-events', component: lazy(() => import('./pages/layer_communications/CommunicationEvent')) },
+  { path: '/communication-events/:param', component: lazy(() => import('./pages/layer_communications/CommunicationEventDetail')) },
+  { path: '/communication-events-history', component: lazy(() => import('./pages/layer_communications/CommunicationEventHistory')) },
 ];
 
 const unprotectedroutes: UnprotectedRoute[] = [

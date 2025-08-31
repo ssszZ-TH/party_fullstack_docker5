@@ -27,11 +27,7 @@ const services = [
   {
     title: "Personal Information",
     items: [
-      { name: "My Profile", path: "/v1/person/me" },
-      { name: "Update Personal Details", path: "/v1/person/update" },
-      { name: "Passport Details", path: "/v1/passport" },
-      { name: "Citizenship", path: "/v1/citizenship" },
-      { name: "Marital Status", path: "/v1/maritalstatus" },
+      { name: "Communication Event", path: "/communication-events" },
     ],
   },
 ];

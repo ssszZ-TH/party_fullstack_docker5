@@ -27,10 +27,7 @@ const services = [
   {
     title: "Organization Information",
     items: [
-      { name: "My Organization", path: "/v1/organization/me" },
-      { name: "Update Organization Details", path: "/v1/organization/update" },
-      { name: "Industry Classification", path: "/v1/classifybyindustry" },
-      { name: "Employee Count Range", path: "/v1/employeecountrange" },
+      { name: "Communication Event", path: "/communication-events" },
     ],
   },
 ];
