@@ -29,9 +29,9 @@ async def create_country_endpoint(country: CountryCreate, current_user: dict = D
 # ดึงข้อมูล country ตาม ID
 @router.get("/{country_id}", response_model=CountryOut)
 async def get_country_endpoint(country_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get country by id={country_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_country(country_id)
     if not result:
         logger.warning(f"Country not found: id={country_id}")
@@ -42,9 +42,9 @@ async def get_country_endpoint(country_id: int, current_user: dict = Depends(get
 # ดึงข้อมูล country ทั้งหมด
 @router.get("/", response_model=List[CountryOut])
 async def get_all_countries_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all countries by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_countries()
     logger.info(f"Retrieved {len(results)} countries")
     return results

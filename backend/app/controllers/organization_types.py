@@ -29,9 +29,9 @@ async def create_organization_type_endpoint(organization_type: OrganizationTypeC
 # ดึงข้อมูล organization_type ตาม ID
 @router.get("/{organization_type_id}", response_model=OrganizationTypeOut)
 async def get_organization_type_endpoint(organization_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get organization_type by id={organization_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_organization_type(organization_type_id)
     if not result:
         logger.warning(f"Organization_type not found: id={organization_type_id}")
@@ -42,9 +42,9 @@ async def get_organization_type_endpoint(organization_type_id: int, current_user
 # ดึงข้อมูล organization_type ทั้งหมด
 @router.get("/", response_model=List[OrganizationTypeOut])
 async def get_all_organization_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all organization_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_organization_types()
     logger.info(f"Retrieved {len(results)} organization_types")
     return results

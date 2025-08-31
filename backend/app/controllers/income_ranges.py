@@ -29,9 +29,9 @@ async def create_income_range_endpoint(income_range: IncomeRangeCreate, current_
 # ดึงข้อมูล income_range ตาม ID
 @router.get("/{income_range_id}", response_model=IncomeRangeOut)
 async def get_income_range_endpoint(income_range_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get income_range by id={income_range_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_income_range(income_range_id)
     if not result:
         logger.warning(f"Income_range not found: id={income_range_id}")
@@ -42,9 +42,9 @@ async def get_income_range_endpoint(income_range_id: int, current_user: dict = D
 # ดึงข้อมูล income_range ทั้งหมด
 @router.get("/", response_model=List[IncomeRangeOut])
 async def get_all_income_ranges_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all income_ranges by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_income_ranges()
     logger.info(f"Retrieved {len(results)} income_ranges")
     return results

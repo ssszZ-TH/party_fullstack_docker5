@@ -29,9 +29,9 @@ async def create_contact_mechanism_type_endpoint(contact_mechanism_type: Contact
 # ดึงข้อมูล contact_mechanism_type ตาม ID
 @router.get("/{contact_mechanism_type_id}", response_model=ContactMechanismTypeOut)
 async def get_contact_mechanism_type_endpoint(contact_mechanism_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get contact_mechanism_type by id={contact_mechanism_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_contact_mechanism_type(contact_mechanism_type_id)
     if not result:
         logger.warning(f"Contact_mechanism_type not found: id={contact_mechanism_type_id}")
@@ -42,9 +42,9 @@ async def get_contact_mechanism_type_endpoint(contact_mechanism_type_id: int, cu
 # ดึงข้อมูล contact_mechanism_type ทั้งหมด
 @router.get("/", response_model=List[ContactMechanismTypeOut])
 async def get_all_contact_mechanism_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all contact_mechanism_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_contact_mechanism_types()
     logger.info(f"Retrieved {len(results)} contact_mechanism_types")
     return results

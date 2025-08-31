@@ -29,9 +29,9 @@ async def create_gender_type_endpoint(gender_type: GenderTypeCreate, current_use
 # ดึงข้อมูล gender_type ตาม ID
 @router.get("/{gender_type_id}", response_model=GenderTypeOut)
 async def get_gender_type_endpoint(gender_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get gender_type by id={gender_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_gender_type(gender_type_id)
     if not result:
         logger.warning(f"Gender_type not found: id={gender_type_id}")
@@ -42,9 +42,9 @@ async def get_gender_type_endpoint(gender_type_id: int, current_user: dict = Dep
 # ดึงข้อมูล gender_type ทั้งหมด
 @router.get("/", response_model=List[GenderTypeOut])
 async def get_all_gender_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all gender_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_gender_types()
     logger.info(f"Retrieved {len(results)} gender_types")
     return results

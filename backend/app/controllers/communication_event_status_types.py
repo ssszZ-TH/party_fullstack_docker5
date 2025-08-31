@@ -29,9 +29,9 @@ async def create_communication_event_status_type_endpoint(communication_event_st
 # ดึงข้อมูล communication_event_status_type ตาม ID
 @router.get("/{communication_event_status_type_id}", response_model=CommunicationEventStatusTypeOut)
 async def get_communication_event_status_type_endpoint(communication_event_status_type_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to get communication_event_status_type by id={communication_event_status_type_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     result = await get_communication_event_status_type(communication_event_status_type_id)
     if not result:
         logger.warning(f"Communication_event_status_type not found: id={communication_event_status_type_id}")
@@ -42,9 +42,9 @@ async def get_communication_event_status_type_endpoint(communication_event_statu
 # ดึงข้อมูล communication_event_status_type ทั้งหมด
 @router.get("/", response_model=List[CommunicationEventStatusTypeOut])
 async def get_all_communication_event_status_types_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user"]:
+    if current_user["role"] not in ["basetype_admin", "organization_admin", "organization_user", "hr_admin", "person_user", "system_admin"]:
         logger.warning(f"Unauthorized attempt to list all communication_event_status_types by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to basetype_admin, organization_admin, organization_user, hr_admin, person_user, or system_admin")
     results = await get_all_communication_event_status_types()
     logger.info(f"Retrieved {len(results)} communication_event_status_types")
     return results
