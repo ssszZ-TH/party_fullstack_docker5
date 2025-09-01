@@ -29,9 +29,9 @@ async def create_person_endpoint(person: PersonCreate, current_user: dict = Depe
 # ดึงข้อมูล person ตาม ID
 @router.get("/{person_id}", response_model=PersonOut)
 async def get_person_endpoint(person_id: int, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["hr_admin", "organization_user", "person_user"]:
+    if current_user["role"] not in ["system_admin", "hr_admin", "organization_admin", "organization_user", "person_user"]:
         logger.warning(f"Unauthorized attempt to get person by id={person_id} by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to hr_admin, organization_user, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to system_admin, hr_admin, organization_admin, organization_user, or person_user")
     result = await get_person(person_id)
     if not result:
         logger.warning(f"Person not found: id={person_id}")
@@ -42,9 +42,9 @@ async def get_person_endpoint(person_id: int, current_user: dict = Depends(get_c
 # ดึงข้อมูล person ทั้งหมด
 @router.get("/", response_model=List[PersonOut])
 async def get_all_persons_endpoint(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["hr_admin", "organization_user", "person_user"]:
+    if current_user["role"] not in ["system_admin", "hr_admin", "organization_admin", "organization_user", "person_user"]:
         logger.warning(f"Unauthorized attempt to list all persons by user: id={current_user['id']}, role={current_user['role']}")
-        raise HTTPException(status_code=403, detail="Access restricted to hr_admin, organization_user, or person_user")
+        raise HTTPException(status_code=403, detail="Access restricted to system_admin, hr_admin, organization_admin, organization_user, or person_user")
     results = await get_all_persons()
     logger.info(f"Retrieved {len(results)} persons")
     return results

@@ -27,7 +27,7 @@ const services = [
   {
     title: "Organization Information",
     items: [
-      { name: "Communication Event", path: "/communication-events" },
+      { name: "Communication", path: "/communication-events" },
     ],
   },
 ];

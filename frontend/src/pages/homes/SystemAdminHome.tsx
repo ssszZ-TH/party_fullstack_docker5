@@ -32,6 +32,7 @@ const services = [
       { name: "User History", path: "/users-history" },
       { name: "Person History", path: "/persons-history" },
       { name: "Organization History", path: "/organizations-history" },
+      { name: "Communication Events Log", path: "/communication-events-history" },
     ],
   },
 ];

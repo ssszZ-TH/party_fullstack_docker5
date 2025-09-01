@@ -29,7 +29,8 @@ const services = [
     title: "Organization Management",
     items: [
       { name: "Organizations", path: "/organizations" },
-      { name: "Organizations History", path: "/organizations-history" },
+      { name: "Organizations Log", path: "/organizations-history" },
+      { name: "Communication Events Log", path: "/communication-events-history" },
     ],
   },
 ];

@@ -29,7 +29,8 @@ const services = [
     title: "Person Management",
     items: [
       { name: "Persons", path: "/persons" },
-      { name: "Persons History", path: "/persons-history" },
+      { name: "Persons Log", path: "/persons-history" },
+      { name: "Communication Events Log", path: "/communication-events-history" },
     ],
   },
 ];

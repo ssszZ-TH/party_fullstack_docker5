@@ -66,7 +66,7 @@ const protectedroutes: ProtectedRoute[] = [
   // layer communication
   { path: '/communication-events', component: lazy(() => import('./pages/layer_communications/CommunicationEvent')) },
   { path: '/communication-events/:param', component: lazy(() => import('./pages/layer_communications/CommunicationEventDetail')) },
-  { path: '/communication-events-history', component: lazy(() => import('./pages/layer_communications/CommunicationEventHistory')) },
+  { path: '/communication-events-history', component: lazy(() => import('./pages/layer_history/CommunicationEventHistory')) },
 ];
 
 const unprotectedroutes: UnprotectedRoute[] = [

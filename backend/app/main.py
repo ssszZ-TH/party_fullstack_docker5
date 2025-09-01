@@ -21,6 +21,7 @@ from app.controllers.users_history import router as users_history_router
 from app.controllers.person_history import router as person_history_router
 from app.controllers.organization_history import router as organization_history_router
 from app.controllers.communication_event import router as communication_event_router
+from app.controllers.communication_event_history import router as communication_event_history_router
 
 load_dotenv()
 
@@ -61,6 +62,7 @@ app.include_router(users_history_router)
 app.include_router(person_history_router)
 app.include_router(organization_history_router)
 app.include_router(communication_event_router)
+app.include_router(communication_event_history_router)
 
 @app.get("/")
 async def root():
