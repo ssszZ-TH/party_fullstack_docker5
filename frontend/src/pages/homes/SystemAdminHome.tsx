@@ -29,9 +29,9 @@ const services = [
     title: "Admin Management",
     items: [
       { name: "Manage User", path: "/users" },
-      { name: "User History", path: "/users-history" },
-      { name: "Person History", path: "/persons-history" },
-      { name: "Organization History", path: "/organizations-history" },
+      { name: "Users Log", path: "/users-history" },
+      { name: "Persons Log", path: "/persons-history" },
+      { name: "Organizations Log", path: "/organizations-history" },
       { name: "Communication Events Log", path: "/communication-events-history" },
     ],
   },
