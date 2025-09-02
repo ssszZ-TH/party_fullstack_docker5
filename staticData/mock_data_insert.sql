@@ -12,8 +12,7 @@ CSV HEADER;
 COPY countries (id, iso_code, name_en, name_th)
 FROM '/staticData/countries.csv'
 DELIMITER ','
-CSV HEADER
-QUOTE '''';
+CSV HEADER;
 
 COPY racial_types (id, description)
 FROM '/staticData/racial_types.csv'
