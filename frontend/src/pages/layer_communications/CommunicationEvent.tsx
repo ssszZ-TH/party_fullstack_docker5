@@ -21,6 +21,7 @@ interface CommunicationEvent {
   title: string;
   detail: string | null;
   from_user_id: number;
+  from_user_name: string | null;
   to_user_id: number;
   to_user_name: string | null;
   contact_mechanism_type_id: number | null;
@@ -59,15 +60,23 @@ export default function CommunicationEvents() {
 
         if (Array.isArray(eventData)) {
           const enrichedEvents = eventData.map(event => {
-            const person = persons.find(p => p.id === event.to_user_id);
-            const organization = organizations.find(o => o.id === event.to_user_id);
-            const to_user_name = person 
-              ? `${person.id} - ${person.first_name} ${person.last_name} ${person.about_me || ''} (Person)`.trim()
-              : organization 
-                ? `${organization.id} - ${organization.name_en} ${organization.slogan || ''} (Organization)`.trim()
+            const fromPerson = persons.find(p => p.id === event.from_user_id);
+            const fromOrganization = organizations.find(o => o.id === event.from_user_id);
+            const from_user_name = fromPerson 
+              ? `${fromPerson.id} - ${fromPerson.first_name} ${fromPerson.last_name} ${fromPerson.about_me || ''} (Person)`.trim()
+              : fromOrganization 
+                ? `${fromOrganization.id} - ${fromOrganization.name_en} ${fromOrganization.slogan || ''} (Organization)`.trim()
+                : 'N/A';
+            const toPerson = persons.find(p => p.id === event.to_user_id);
+            const toOrganization = organizations.find(o => o.id === event.to_user_id);
+            const to_user_name = toPerson 
+              ? `${toPerson.id} - ${toPerson.first_name} ${toPerson.last_name} ${toPerson.about_me || ''} (Person)`.trim()
+              : toOrganization 
+                ? `${toOrganization.id} - ${toOrganization.name_en} ${toOrganization.slogan || ''} (Organization)`.trim()
                 : 'N/A';
             return {
               ...event,
+              from_user_name,
               to_user_name,
               contact_mechanism_type_description: contactMechanismTypes.find(c => c.id === event.contact_mechanism_type_id)?.description || 'N/A',
               communication_event_status_type_description: communicationEventStatusTypes.find(s => s.id === event.communication_event_status_type_id)?.description || 'N/A',
@@ -110,6 +119,8 @@ export default function CommunicationEvents() {
     { field: 'title', headerName: 'Title', width: 200 },
     { field: 'detail', headerName: 'Detail', width: 200, valueFormatter: (value: string | null) => value || 'N/A' },
     { field: 'from_user_id', headerName: 'From User ID', width: 120 },
+    { field: 'from_user_name', headerName: 'From User', width: 300 },
+    { field: 'to_user_id', headerName: 'To User ID', width: 120 },
     { field: 'to_user_name', headerName: 'To User', width: 300 },
     { field: 'contact_mechanism_type_description', headerName: 'Contact Mechanism', width: 150 },
     { field: 'communication_event_status_type_description', headerName: 'Status', width: 150 },
