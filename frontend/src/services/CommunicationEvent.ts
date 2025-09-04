@@ -65,6 +65,17 @@ export const getSentCommunicationEvents = async (): Promise<CommunicationEvent[]
   return response.data;
 };
 
+export const getFavoriteCommunicationEvents = async (): Promise<CommunicationEvent[]> => {
+  const token = Cookies.get('access_token');
+  if (!token) {
+    throw new Error('No access token found');
+  }
+  const response = await axios.get(`${BASE_URL}/communication_events/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export const getCommunicationEventById = async (id: number): Promise<CommunicationEvent> => {
   const token = Cookies.get('access_token');
   if (!token) {

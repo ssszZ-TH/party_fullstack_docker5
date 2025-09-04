@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Container, Typography, Paper, Stack, TextField, MenuItem, Select, InputLabel, FormControl, Autocomplete } from '@mui/material';
+import { Box, Container, Typography, Paper, Stack, TextField, MenuItem, Select, InputLabel, FormControl, Autocomplete, IconButton } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getCommunicationEventById, updateCommunicationEvent, createCommunicationEvent, deleteCommunicationEvent } from '../../services/CommunicationEvent';
@@ -13,6 +13,7 @@ import AppBarCustom from '../../components/AppBarCustom';
 import SaveButton from '../../components/buttons/SaveButton';
 import CancelButton from '../../components/buttons/CancelButton';
 import DeleteButton from '../../components/buttons/DeleteButton';
+import FavoriteButton from '../../components/buttons/FavoriteButton';
 import Loading from '../../components/Loading';
 
 interface CommunicationEvent {
@@ -23,6 +24,7 @@ interface CommunicationEvent {
   to_user_id: number;
   contact_mechanism_type_id: number | null;
   communication_event_status_type_id: number | null;
+  favorite_flag: boolean;
   created_at: string;
   updated_at: string | null;
 }
@@ -56,6 +58,7 @@ export default function CommunicationEventDetail() {
     to_user_id: 0, 
     contact_mechanism_type_id: null, 
     communication_event_status_type_id: null, 
+    favorite_flag: false,
     created_at: '',
     updated_at: null 
   } : null);
@@ -65,6 +68,7 @@ export default function CommunicationEventDetail() {
     to_user_id: '',
     contact_mechanism_type_id: '',
     communication_event_status_type_id: '',
+    favorite_flag: false,
   });
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [contactMechanismTypes, setContactMechanismTypes] = useState<ContactMechanismType[]>([]);
@@ -116,6 +120,7 @@ export default function CommunicationEventDetail() {
               to_user_id: data.to_user_id ? data.to_user_id.toString() : '',
               contact_mechanism_type_id: data.contact_mechanism_type_id ? data.contact_mechanism_type_id.toString() : '',
               communication_event_status_type_id: data.communication_event_status_type_id ? data.communication_event_status_type_id.toString() : '',
+              favorite_flag: data.favorite_flag || false,
             });
           } else {
             setError('Invalid communication event data');
@@ -136,6 +141,19 @@ export default function CommunicationEventDetail() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFavoriteToggle = async () => {
+    if (!param || isCreateMode) return;
+    try {
+      const newFavoriteFlag = !formData.favorite_flag;
+      await updateCommunicationEvent(parseInt(param), { favorite_flag: newFavoriteFlag });
+      setFormData({ ...formData, favorite_flag: newFavoriteFlag });
+      setEvent(prev => prev ? { ...prev, favorite_flag: newFavoriteFlag } : prev);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      setError('Failed to update favorite status');
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const updateData: {
@@ -144,6 +162,7 @@ export default function CommunicationEventDetail() {
         to_user_id?: number;
         contact_mechanism_type_id?: number | null;
         communication_event_status_type_id?: number | null;
+        favorite_flag?: boolean;
       } = {};
       if (formData.title) updateData.title = formData.title;
       if (formData.detail) updateData.detail = formData.detail;
@@ -153,6 +172,7 @@ export default function CommunicationEventDetail() {
       else if (formData.contact_mechanism_type_id === '') updateData.contact_mechanism_type_id = null;
       if (formData.communication_event_status_type_id) updateData.communication_event_status_type_id = parseInt(formData.communication_event_status_type_id);
       else if (formData.communication_event_status_type_id === '') updateData.communication_event_status_type_id = null;
+      if (formData.favorite_flag !== undefined) updateData.favorite_flag = formData.favorite_flag;
 
       if (Object.keys(updateData).length === 0) {
         setError('No changes to save');
@@ -213,9 +233,17 @@ export default function CommunicationEventDetail() {
       <AppBarCustom title={isCreateMode ? "Create Communication Event" : "Communication Event Detail"} />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 'shape.borderRadius', bgcolor: 'background.paper' }}>
-          <Typography variant="h4" sx={{ color: 'text.primary', mb: 2 }}>
-            {isCreateMode ? 'Create New Communication Event' : 'Edit Communication Event'}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h4" sx={{ color: 'text.primary' }}>
+              {isCreateMode ? 'Create New Communication Event' : 'Edit Communication Event'}
+            </Typography>
+            {!isCreateMode && (
+              <FavoriteButton
+                isFavorite={formData.favorite_flag}
+                onClick={handleFavoriteToggle}
+              />
+            )}
+          </Box>
           <Box sx={{ mb: 4 }}>
             {!isCreateMode && (
               <TextField

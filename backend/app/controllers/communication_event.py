@@ -24,8 +24,40 @@ async def create_communication_event_endpoint(communication_event: Communication
     logger.info(f"Created communication_event: id={result.id}, from_user_id={current_user['id']}")
     return result
 
+# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ current_user (ทั้งหมด)
+@router.get("/", response_model=List[CommunicationEventOut])
+async def get_user_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
+    results = await get_user_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} communication_events for user: id={current_user['id']}")
+    return results
+
+# ดึงข้อมูล communication events ที่ current_user เป็นผู้รับ (inbox)
+@router.get("/inbox", response_model=List[CommunicationEventOut])
+async def get_inbox_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี to_user_id ตรงกับ current_user
+    results = await get_inbox_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} inbox communication_events for user: id={current_user['id']}")
+    return results
+
+# ดึงข้อมูล communication events ที่ current_user เป็นผู้ส่ง (sent)
+@router.get("/sent", response_model=List[CommunicationEventOut])
+async def get_sent_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี from_user_id ตรงกับ current_user
+    results = await get_sent_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} sent communication_events for user: id={current_user['id']}")
+    return results
+
+# ดึงข้อมูล communication events ที่ถูกตั้งค่า favorite_flag = True และเกี่ยวข้องกับ current_user
+@router.get("/favorites", response_model=List[CommunicationEventOut])
+async def get_favorite_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user และ favorite_flag = True
+    results = await get_favorite_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} favorite communication_events for user: id={current_user['id']}")
+    return results
+
 # ดึงข้อมูล communication event ตาม ID (อนุญาตเฉพาะ from_user_id หรือ to_user_id เท่ากับ current_user)
-@router.get("/{communication_event_id}", response_model=CommunicationEventOut)
+@router.get("/{communication_event_id:int}", response_model=CommunicationEventOut)
 async def get_communication_event_endpoint(communication_event_id: int, current_user: dict = Depends(get_current_user)):
     # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
     result = await get_communication_event(communication_event_id)
@@ -38,40 +70,8 @@ async def get_communication_event_endpoint(communication_event_id: int, current_
     logger.info(f"Retrieved communication_event: id={communication_event_id}")
     return result
 
-# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ current_user (ทั้งหมด)
-@router.get("/", response_model=List[CommunicationEventOut])
-async def get_user_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
-    # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
-    results = await get_user_communication_events(current_user["id"])
-    logger.info(f"Retrieved {len(results)} communication_events for user: id={current_user['id']}")
-    return results
-
-# ดึงข้อมูล communication events ที่ current_user เป็นผู้รับ (inbox)
-@router.get("/inbox/", response_model=List[CommunicationEventOut])
-async def get_inbox_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
-    # อนุญาตทุก role ที่มี to_user_id ตรงกับ current_user
-    results = await get_inbox_communication_events(current_user["id"])
-    logger.info(f"Retrieved {len(results)} inbox communication_events for user: id={current_user['id']}")
-    return results
-
-# ดึงข้อมูล communication events ที่ current_user เป็นผู้ส่ง (sent)
-@router.get("/sent/", response_model=List[CommunicationEventOut])
-async def get_sent_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
-    # อนุญาตทุก role ที่มี from_user_id ตรงกับ current_user
-    results = await get_sent_communication_events(current_user["id"])
-    logger.info(f"Retrieved {len(results)} sent communication_events for user: id={current_user['id']}")
-    return results
-
-# ดึงข้อมูล communication events ที่ถูกตั้งค่า favorite_flag = True และเกี่ยวข้องกับ current_user
-@router.get("/favorites/", response_model=List[CommunicationEventOut])
-async def get_favorite_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
-    # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user และ favorite_flag = True
-    results = await get_favorite_communication_events(current_user["id"])
-    logger.info(f"Retrieved {len(results)} favorite communication_events for user: id={current_user['id']}")
-    return results
-
 # อัปเดตข้อมูล communication event (อนุญาตเฉพาะ from_user_id หรือ to_user_id เท่ากับ current_user)
-@router.put("/{communication_event_id}", response_model=CommunicationEventOut)
+@router.put("/{communication_event_id:int}", response_model=CommunicationEventOut)
 async def update_communication_event_endpoint(communication_event_id: int, communication_event: CommunicationEventUpdate, current_user: dict = Depends(get_current_user)):
     # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
     existing_event = await get_communication_event(communication_event_id)
@@ -89,7 +89,7 @@ async def update_communication_event_endpoint(communication_event_id: int, commu
     return result
 
 # ลบ communication event (อนุญาตเฉพาะ from_user_id หรือ to_user_id เท่ากับ current_user)
-@router.delete("/{communication_event_id}")
+@router.delete("/{communication_event_id:int}")
 async def delete_communication_event_endpoint(communication_event_id: int, current_user: dict = Depends(get_current_user)):
     # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
     existing_event = await get_communication_event(communication_event_id)
