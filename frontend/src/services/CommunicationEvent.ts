@@ -11,6 +11,7 @@ interface CommunicationEvent {
   to_user_id: number;
   contact_mechanism_type_id: number | null;
   communication_event_status_type_id: number | null;
+  favorite_flag: boolean;
   created_at: string;
   updated_at: string | null;
 }
@@ -28,6 +29,7 @@ interface UpdateData {
   detail?: string | null;
   contact_mechanism_type_id?: number | null;
   communication_event_status_type_id?: number | null;
+  favorite_flag?: boolean;
 }
 
 export const getCommunicationEvents = async (): Promise<CommunicationEvent[]> => {
@@ -36,6 +38,28 @@ export const getCommunicationEvents = async (): Promise<CommunicationEvent[]> =>
     throw new Error('No access token found');
   }
   const response = await axios.get(`${BASE_URL}/communication_events`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getInboxCommunicationEvents = async (): Promise<CommunicationEvent[]> => {
+  const token = Cookies.get('access_token');
+  if (!token) {
+    throw new Error('No access token found');
+  }
+  const response = await axios.get(`${BASE_URL}/communication_events/inbox`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getSentCommunicationEvents = async (): Promise<CommunicationEvent[]> => {
+  const token = Cookies.get('access_token');
+  if (!token) {
+    throw new Error('No access token found');
+  }
+  const response = await axios.get(`${BASE_URL}/communication_events/sent`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

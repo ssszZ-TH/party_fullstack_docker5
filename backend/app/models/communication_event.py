@@ -97,6 +97,19 @@ async def get_sent_communication_events(user_id: int) -> List[CommunicationEvent
     logger.info(f"Retrieved {len(results)} sent communication_events for user_id={user_id}")
     return [CommunicationEventOut(**result._mapping) for result in results]
 
+# ดึงข้อมูล communication events ที่ถูกตั้งค่า favorite_flag = True และเกี่ยวข้องกับ user_id
+async def get_favorite_communication_events(user_id: int) -> List[CommunicationEventOut]:
+    query = """
+        SELECT id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
+               communication_event_status_type_id, favorite_flag, created_at, updated_at 
+        FROM communication_event 
+        WHERE (from_user_id = :user_id OR to_user_id = :user_id) AND favorite_flag = TRUE
+        ORDER BY created_at DESC
+    """
+    results = await database.fetch_all(query=query, values={"user_id": user_id})
+    logger.info(f"Retrieved {len(results)} favorite communication_events for user_id={user_id}")
+    return [CommunicationEventOut(**result._mapping) for result in results]
+
 # สร้าง communication event ใหม่
 async def create_communication_event(communication_event: CommunicationEventCreate, action_by: Optional[int] = None) -> Optional[CommunicationEventOut]:
     async with database.transaction():
@@ -116,7 +129,7 @@ async def create_communication_event(communication_event: CommunicationEventCrea
                 "to_user_id": communication_event.to_user_id,
                 "contact_mechanism_type_id": communication_event.contact_mechanism_type_id,
                 "communication_event_status_type_id": communication_event.communication_event_status_type_id,
-                "favorite_flag": False  # Default value as per schema
+                "favorite_flag": False
             }
             result = await database.fetch_one(query=query, values=values)
             if result:
