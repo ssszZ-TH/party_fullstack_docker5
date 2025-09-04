@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from typing import List
 import logging
-from app.models.communication_event import create_communication_event, get_communication_event, update_communication_event, delete_communication_event, get_user_communication_events
+from app.models.communication_event import create_communication_event, get_communication_event, update_communication_event, delete_communication_event, get_user_communication_events, get_inbox_communication_events, get_sent_communication_events
 from app.schemas.communication_event import CommunicationEventCreate, CommunicationEventUpdate, CommunicationEventOut
 from app.controllers.users.user import get_current_user
 
@@ -38,12 +38,28 @@ async def get_communication_event_endpoint(communication_event_id: int, current_
     logger.info(f"Retrieved communication_event: id={communication_event_id}")
     return result
 
-# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ current_user (อนุญาตทุก role)
+# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ current_user (ทั้งหมด)
 @router.get("/", response_model=List[CommunicationEventOut])
 async def get_user_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
     # อนุญาตทุก role ที่มี from_user_id หรือ to_user_id ตรงกับ current_user
     results = await get_user_communication_events(current_user["id"])
     logger.info(f"Retrieved {len(results)} communication_events for user: id={current_user['id']}")
+    return results
+
+# ดึงข้อมูล communication events ที่ current_user เป็นผู้รับ (inbox)
+@router.get("/inbox/", response_model=List[CommunicationEventOut])
+async def get_inbox_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี to_user_id ตรงกับ current_user
+    results = await get_inbox_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} inbox communication_events for user: id={current_user['id']}")
+    return results
+
+# ดึงข้อมูล communication events ที่ current_user เป็นผู้ส่ง (sent)
+@router.get("/sent/", response_model=List[CommunicationEventOut])
+async def get_sent_communication_events_endpoint(current_user: dict = Depends(get_current_user)):
+    # อนุญาตทุก role ที่มี from_user_id ตรงกับ current_user
+    results = await get_sent_communication_events(current_user["id"])
+    logger.info(f"Retrieved {len(results)} sent communication_events for user: id={current_user['id']}")
     return results
 
 # อัปเดตข้อมูล communication event (อนุญาตเฉพาะ from_user_id หรือ to_user_id เท่ากับ current_user)

@@ -181,6 +181,7 @@ CREATE TABLE communication_event (
     to_user_id INT REFERENCES users(id) ON DELETE SET NULL,
     contact_mechanism_type_id INT REFERENCES contact_mechanism_types(id) ON DELETE SET NULL,
     communication_event_status_type_id INT REFERENCES communication_event_status_types(id) ON DELETE SET NULL,
+    favorite_flag BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -198,6 +199,7 @@ CREATE TABLE communication_event_history (
     to_user_id INT,
     contact_mechanism_type_id INT,
     communication_event_status_type_id INT,
+    favorite_flag BOOLEAN NOT NULL DEFAULT FALSE,
     action VARCHAR(50),
     action_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     action_by INT

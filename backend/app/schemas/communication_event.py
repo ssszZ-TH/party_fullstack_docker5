@@ -16,6 +16,7 @@ class CommunicationEventUpdate(BaseModel):
     detail: Optional[str] = None
     contact_mechanism_type_id: Optional[int] = None
     communication_event_status_type_id: Optional[int] = None
+    favorite_flag: Optional[bool] = None
 
 # Schema สำหรับแสดงผล communication event
 class CommunicationEventOut(BaseModel):
@@ -26,6 +27,7 @@ class CommunicationEventOut(BaseModel):
     to_user_id: int
     contact_mechanism_type_id: Optional[int] = None
     communication_event_status_type_id: Optional[int] = None
+    favorite_flag: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
 

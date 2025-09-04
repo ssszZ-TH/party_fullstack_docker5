@@ -16,6 +16,7 @@ async def log_communication_event_history(
     to_user_id: int,
     contact_mechanism_type_id: Optional[int],
     communication_event_status_type_id: Optional[int],
+    favorite_flag: bool,
     action: str,
     action_by: Optional[int] = None
 ):
@@ -23,11 +24,11 @@ async def log_communication_event_history(
         INSERT INTO communication_event_history (
             communication_event_id, title, detail, from_user_id, to_user_id, 
             contact_mechanism_type_id, communication_event_status_type_id, 
-            action, action_by, action_at
+            favorite_flag, action, action_by, action_at
         )
         VALUES (:communication_event_id, :title, :detail, :from_user_id, :to_user_id, 
                 :contact_mechanism_type_id, :communication_event_status_type_id, 
-                :action, :action_by, :action_at)
+                :favorite_flag, :action, :action_by, :action_at)
     """
     values = {
         "communication_event_id": communication_event_id,
@@ -37,6 +38,7 @@ async def log_communication_event_history(
         "to_user_id": to_user_id,
         "contact_mechanism_type_id": contact_mechanism_type_id,
         "communication_event_status_type_id": communication_event_status_type_id,
+        "favorite_flag": favorite_flag,
         "action": action,
         "action_by": action_by,
         "action_at": datetime.utcnow()
@@ -48,7 +50,7 @@ async def log_communication_event_history(
 async def get_communication_event(communication_event_id: int) -> Optional[CommunicationEventOut]:
     query = """
         SELECT id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
-               communication_event_status_type_id, created_at, updated_at 
+               communication_event_status_type_id, favorite_flag, created_at, updated_at 
         FROM communication_event 
         WHERE id = :id
     """
@@ -56,11 +58,11 @@ async def get_communication_event(communication_event_id: int) -> Optional[Commu
     logger.info(f"Retrieved communication_event: id={communication_event_id}")
     return CommunicationEventOut(**result._mapping) if result else None
 
-# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ user_id
+# ดึงข้อมูล communication events ที่เกี่ยวข้องกับ user_id (ทั้งหมด)
 async def get_user_communication_events(user_id: int) -> List[CommunicationEventOut]:
     query = """
         SELECT id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
-               communication_event_status_type_id, created_at, updated_at 
+               communication_event_status_type_id, favorite_flag, created_at, updated_at 
         FROM communication_event 
         WHERE from_user_id = :user_id OR to_user_id = :user_id
         ORDER BY created_at DESC
@@ -69,25 +71,52 @@ async def get_user_communication_events(user_id: int) -> List[CommunicationEvent
     logger.info(f"Retrieved {len(results)} communication_events for user_id={user_id}")
     return [CommunicationEventOut(**result._mapping) for result in results]
 
+# ดึงข้อมูล communication events ที่ user_id เป็นผู้รับ (inbox)
+async def get_inbox_communication_events(user_id: int) -> List[CommunicationEventOut]:
+    query = """
+        SELECT id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
+               communication_event_status_type_id, favorite_flag, created_at, updated_at 
+        FROM communication_event 
+        WHERE to_user_id = :user_id
+        ORDER BY created_at DESC
+    """
+    results = await database.fetch_all(query=query, values={"user_id": user_id})
+    logger.info(f"Retrieved {len(results)} inbox communication_events for user_id={user_id}")
+    return [CommunicationEventOut(**result._mapping) for result in results]
+
+# ดึงข้อมูล communication events ที่ user_id เป็นผู้ส่ง (sent)
+async def get_sent_communication_events(user_id: int) -> List[CommunicationEventOut]:
+    query = """
+        SELECT id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
+               communication_event_status_type_id, favorite_flag, created_at, updated_at 
+        FROM communication_event 
+        WHERE from_user_id = :user_id
+        ORDER BY created_at DESC
+    """
+    results = await database.fetch_all(query=query, values={"user_id": user_id})
+    logger.info(f"Retrieved {len(results)} sent communication_events for user_id={user_id}")
+    return [CommunicationEventOut(**result._mapping) for result in results]
+
 # สร้าง communication event ใหม่
 async def create_communication_event(communication_event: CommunicationEventCreate, action_by: Optional[int] = None) -> Optional[CommunicationEventOut]:
     async with database.transaction():
         try:
             query = """
                 INSERT INTO communication_event (title, detail, from_user_id, to_user_id, 
-                                                contact_mechanism_type_id, communication_event_status_type_id)
+                                                contact_mechanism_type_id, communication_event_status_type_id, favorite_flag)
                 VALUES (:title, :detail, :from_user_id, :to_user_id, :contact_mechanism_type_id, 
-                        :communication_event_status_type_id)
+                        :communication_event_status_type_id, :favorite_flag)
                 RETURNING id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
-                          communication_event_status_type_id, created_at, updated_at
+                          communication_event_status_type_id, favorite_flag, created_at, updated_at
             """
             values = {
                 "title": communication_event.title,
                 "detail": communication_event.detail,
-                "from_user_id": action_by,  # Use action_by as from_user_id from JWT
+                "from_user_id": action_by,
                 "to_user_id": communication_event.to_user_id,
                 "contact_mechanism_type_id": communication_event.contact_mechanism_type_id,
-                "communication_event_status_type_id": communication_event.communication_event_status_type_id
+                "communication_event_status_type_id": communication_event.communication_event_status_type_id,
+                "favorite_flag": False  # Default value as per schema
             }
             result = await database.fetch_one(query=query, values=values)
             if result:
@@ -99,6 +128,7 @@ async def create_communication_event(communication_event: CommunicationEventCrea
                     to_user_id=communication_event.to_user_id,
                     contact_mechanism_type_id=communication_event.contact_mechanism_type_id,
                     communication_event_status_type_id=communication_event.communication_event_status_type_id,
+                    favorite_flag=False,
                     action="create",
                     action_by=action_by
                 )
@@ -132,6 +162,9 @@ async def update_communication_event(communication_event_id: int, communication_
         if communication_event.communication_event_status_type_id is not None:
             query_parts.append("communication_event_status_type_id = :communication_event_status_type_id")
             values["communication_event_status_type_id"] = communication_event.communication_event_status_type_id
+        if communication_event.favorite_flag is not None:
+            query_parts.append("favorite_flag = :favorite_flag")
+            values["favorite_flag"] = communication_event.favorite_flag
 
         if not query_parts:
             logger.info(f"No fields to update for communication_event id={communication_event_id}")
@@ -142,7 +175,7 @@ async def update_communication_event(communication_event_id: int, communication_
             SET {', '.join(query_parts)}, updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
             RETURNING id, title, detail, from_user_id, to_user_id, contact_mechanism_type_id, 
-                      communication_event_status_type_id, created_at, updated_at
+                      communication_event_status_type_id, favorite_flag, created_at, updated_at
         """
         result = await database.fetch_one(query=query, values=values)
         if result:
@@ -154,6 +187,7 @@ async def update_communication_event(communication_event_id: int, communication_
                 to_user_id=old_data.to_user_id,
                 contact_mechanism_type_id=communication_event.contact_mechanism_type_id if communication_event.contact_mechanism_type_id is not None else old_data.contact_mechanism_type_id,
                 communication_event_status_type_id=communication_event.communication_event_status_type_id if communication_event.communication_event_status_type_id is not None else old_data.communication_event_status_type_id,
+                favorite_flag=communication_event.favorite_flag if communication_event.favorite_flag is not None else old_data.favorite_flag,
                 action="update",
                 action_by=action_by
             )
@@ -177,6 +211,7 @@ async def delete_communication_event(communication_event_id: int, action_by: Opt
             to_user_id=old_data.to_user_id,
             contact_mechanism_type_id=old_data.contact_mechanism_type_id,
             communication_event_status_type_id=old_data.communication_event_status_type_id,
+            favorite_flag=old_data.favorite_flag,
             action="delete",
             action_by=action_by
         )
