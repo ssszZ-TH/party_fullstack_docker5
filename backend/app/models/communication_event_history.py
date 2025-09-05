@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 async def get_communication_event_history(history_id: int) -> CommunicationEventHistoryOut:
     query = """
         SELECT id, communication_event_id, title, detail, from_user_id, to_user_id, 
-               contact_mechanism_type_id, communication_event_status_type_id, action, 
-               action_at, action_by 
+               contact_mechanism_type_id, communication_event_status_type_id, favorite_flag, 
+               action, action_at, action_by 
         FROM communication_event_history 
         WHERE id = :id
     """
@@ -23,8 +23,8 @@ async def get_communication_event_history(history_id: int) -> CommunicationEvent
 async def get_all_communication_event_history() -> List[CommunicationEventHistoryOut]:
     query = """
         SELECT id, communication_event_id, title, detail, from_user_id, to_user_id, 
-               contact_mechanism_type_id, communication_event_status_type_id, action, 
-               action_at, action_by 
+               contact_mechanism_type_id, communication_event_status_type_id, favorite_flag, 
+               action, action_at, action_by 
         FROM communication_event_history 
         ORDER BY action_at DESC
     """

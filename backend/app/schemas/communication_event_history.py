@@ -12,6 +12,7 @@ class CommunicationEventHistoryOut(BaseModel):
     to_user_id: Optional[int]
     contact_mechanism_type_id: Optional[int]
     communication_event_status_type_id: Optional[int]
+    favorite_flag: bool
     action: Optional[str]
     action_at: datetime
     action_by: Optional[int]

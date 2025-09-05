@@ -14,7 +14,7 @@ router = APIRouter(prefix="/communication_event_history", tags=["communication_e
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # ดึงข้อมูล communication_event_history ตาม ID
-@router.get("/{history_id}", response_model=CommunicationEventHistoryOut)
+@router.get("/{history_id:int}", response_model=CommunicationEventHistoryOut)
 async def get_communication_event_history_endpoint(history_id: int, current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["system_admin", "hr_admin", "organization_admin"]:
         logger.warning(f"Unauthorized attempt to get communication_event_history by id={history_id} by user: id={current_user['id']}, role={current_user['role']}")

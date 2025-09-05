@@ -27,6 +27,7 @@ interface CommunicationEventHistory {
   contact_mechanism_type_description: string | null;
   communication_event_status_type_id: number | null;
   communication_event_status_type_description: string | null;
+  favorite_flag: boolean;
   action: string | null;
   action_at: string;
   action_by: number | null;
@@ -113,6 +114,7 @@ export default function CommunicationEventHistory() {
     { field: 'to_user_name', headerName: 'To User', width: 300 },
     { field: 'contact_mechanism_type_description', headerName: 'Contact Mechanism', width: 150 },
     { field: 'communication_event_status_type_description', headerName: 'Status', width: 150 },
+    { field: 'favorite_flag', headerName: 'Favorite', width: 100, valueFormatter: (value: boolean) => value ? 'Yes' : 'No' },
     { field: 'action', headerName: 'Action', width: 120, valueFormatter: (value: string | null) => value || 'N/A' },
     { field: 'action_at', headerName: 'Action At', width: 180, valueFormatter: (value: string | null) => formatDateTime(value) },
     { field: 'action_by', headerName: 'Action By', width: 100, valueFormatter: (value: number | null) => value ?? 'N/A' },

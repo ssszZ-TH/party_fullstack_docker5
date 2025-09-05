@@ -12,6 +12,7 @@ interface CommunicationEventHistory {
   to_user_id: number | null;
   contact_mechanism_type_id: number | null;
   communication_event_status_type_id: number | null;
+  favorite_flag: boolean;
   action: string | null;
   action_at: string;
   action_by: number | null;
