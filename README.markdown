@@ -2,7 +2,7 @@
 
 ## image
 
-![Party Communication Fullstack Project (Version 5)](docs\drawio\all_page\011_basetype_admin_home.png)
+![Party Communication Fullstack Project (Version 5)](./docs/drawio/all_page/011_basetype_admin_home.png)
 
 ![bench mark](./docs/postman/Screenshot%202025-09-22%20143713.png)
 
