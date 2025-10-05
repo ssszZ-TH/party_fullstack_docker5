@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2" pages="5">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2" pages="6">
   <diagram name="now" id="HoXw27S7GCQlxkwFxOEj">
     <mxGraphModel dx="1042" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -584,6 +584,80 @@
         </mxCell>
         <mxCell id="uIVB_tROiFuELNopgrkw-36" value="&lt;span style=&quot;color: rgba(0,0,0,var(--O42jJQ,1)); caret-color: rgb(0, 0, 0); --Ys-XuQ: none; font-kerning: normal;&quot; class=&quot;a_GcMg font-feature-liga-off font-feature-clig-off font-feature-calt-off text-decoration-none text-strikethrough-none&quot;&gt;Uvicorn&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="483.93" y="520" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="-2vit6ke5GbNd2O7iySF" name="vm vs con">
+    <mxGraphModel dx="1869" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-1" value="Infrastructure" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry y="280" width="380" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-4" value="Guest OS" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-5" value="Guest OS" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="130" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-6" value="Guest OS" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="260" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-8" value="Hypervisor" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;strokeWidth=4;" parent="1" vertex="1">
+          <mxGeometry y="210" width="380" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-10" value="Infrastructure" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="447" y="280" width="380" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-11" value="OS" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="447" y="210" width="380" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-13" value="Container Engine" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;strokeWidth=4;" parent="1" vertex="1">
+          <mxGeometry x="447" y="140" width="380" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-14" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-15" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="130" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-16" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="260" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-17" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="447" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-18" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="577" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-19" value="Bins / Lib" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="707" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-20" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-21" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-22" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-23" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="447" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-24" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="577" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-25" value="App" style="rounded=1;whiteSpace=wrap;html=1;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="707" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-26" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;Virtual Machine&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry y="340" width="380" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LKVlTAqisCAo5_dtgvXQ-27" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;Container&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;glass=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="447" y="340" width="380" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
